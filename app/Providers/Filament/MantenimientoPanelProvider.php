@@ -5,54 +5,44 @@ namespace App\Providers\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
+use App\Filament\Widgets\MantenimientosList;
+use App\Filament\Widgets\CronogramaMantenimientos;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\App;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Illuminate\Contracts\Support\Htmlable;
-use Filament\Enums\ThemeMode;
 
-class AdminPanelProvider extends PanelProvider
+class MantenimientoPanelProvider extends PanelProvider
 {
-
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->brandName('Control de Taller')
-            ->brandLogo(asset('images/barlovento-logo.png'))
-            ->path('admin')
-            ->login()
-            ->darkMode(false)
-            ->favicon(asset('images/favicon.png'))
+            ->id('mantenimiento')
+            ->path('mantenimiento')
             ->colors([
                 'primary' => Color::Indigo,
             ])
-            // ->navigationGroups([
-            //     NavigationGroup::make()
-            //          ->label('Barlovento')
-            //          ->icon('heroicon-o-clipboard-document-list')
-            //          ->collapsed()
-            // ])
-            ->sidebarWidth('13rem')
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->brandName('Control de Taller')
+            ->brandLogo(asset('images/barlovento-logo.png'))
+            ->discoverResources(in: app_path('Filament/Mantenimiento/Resources'), for: 'App\\Filament\\Mantenimiento\\Resources')
+            ->discoverPages(in: app_path('Filament/Mantenimiento/Pages'), for: 'App\\Filament\\Mantenimiento\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Mantenimiento/Widgets'), for: 'App\\Filament\\Mantenimiento\\Widgets')
             ->widgets([
-                \App\Filament\Resources\BarloventoResource\Widgets\BarloventoButton::class,
+                CronogramaMantenimientos::class,
+                MantenimientosList::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -69,5 +59,4 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
-
 }

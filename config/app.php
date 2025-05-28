@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'BalanceControl'),
+    'name' => env('APP_NAME', 'TallerControl'),
 
     /*
     |--------------------------------------------------------------------------
@@ -194,6 +194,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\Filament\AdminPanelProvider::class,
+        App\Providers\Filament\MantenimientoPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
 
     ],

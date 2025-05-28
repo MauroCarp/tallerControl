@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Mantenimiento\Resources;
 
-use App\Filament\Resources\DestinosEgresosResource\Pages;
-use App\Filament\Resources\DestinosEgresosResource\RelationManagers;
-use App\Models\DestinosEgresos;
+use App\Filament\Mantenimiento\Resources\MantenimientosResource\Pages;
+use App\Filament\Mantenimiento\Resources\MantenimientosResource\RelationManagers;
+use App\Models\MantenimientosHerramientas;
+use App\Models\Mantenimientosservices;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,11 +14,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DestinosEgresosResource extends Resource
+class MantenimientosResource extends Resource
 {
-    protected static ?string $model = DestinosEgresos::class;
-    
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $model = Mantenimientosservices::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+    protected static ?string $navigationLabel = 'Mantenimientos'; // Nombre del enlace
+    protected static ?string $breadcrumb = 'Gestión de Mantenimientos';
 
     public static function form(Form $form): Form
     {
@@ -56,9 +59,9 @@ class DestinosEgresosResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDestinosEgresos::route('/'),
-            'create' => Pages\CreateDestinosEgresos::route('/create'),
-            'edit' => Pages\EditDestinosEgresos::route('/{record}/edit'),
+            'index' => Pages\ListMantenimientos::route('/'),
+            'create' => Pages\CreateMantenimientos::route('/create'),
+            'edit' => Pages\EditMantenimientos::route('/{record}/edit'),
         ];
     }
 }
