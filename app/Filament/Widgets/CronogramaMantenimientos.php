@@ -2,8 +2,7 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Mantenimientosservices;
-use App\Models\Rodados;
+use App\Models\RodadosHerramientas;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -25,15 +24,41 @@ class CronogramaMantenimientos extends BaseWidget
         {
             return $table
                 ->query(
-                    Mantenimientosservices::query()->select(['fecha', 'rodadoHerramienta_id', 'responsable'])
+                    RodadosHerramientas::query()->select(['id','nombre', 'frecuencia', 'agenda'])
+                    ->orderBy('frecuencia', 'desc')
                 )
                 ->columns([
                     Tables\Columns\TextColumn::make('nombre')
                         ->label('Rodados/Herramientas'),
                     Tables\Columns\TextColumn::make('frecuencia')
-                        ->label('Frecuencia'),
+                        ->label('Frecuencia')
+                        ->formatStateUsing(function ($state){
+                            if($state == 0) {
+
+                            return 'Cada vez que se use';
+                            
+                            } else {
+
+                                return $state . ' días';
+
+                            }
+                        }),
                     Tables\Columns\TextColumn::make('agenda')
-                        ->label(''),
+                        ->label('')
+                        ->formatStateUsing(function ($state){
+                            $agenda = json_decode(str_replace("'",'"',$state), true);
+
+                            if (is_null($agenda)) {
+                                return '';
+                            }
+
+
+                            $diaKey = array_key_first($agenda);
+                            $turno = $agenda[$diaKey] ?? '';
+                            return $diaKey . ' de la ' . $turno;
+                            
+                        }),
+
                 ])->paginated(false); 
         }
 

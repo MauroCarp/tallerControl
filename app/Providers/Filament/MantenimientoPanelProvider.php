@@ -24,6 +24,8 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class MantenimientoPanelProvider extends PanelProvider
 {
+    
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -34,6 +36,7 @@ class MantenimientoPanelProvider extends PanelProvider
             ])
             ->brandName('Control de Taller')
             ->brandLogo(asset('images/barlovento-logo.png'))
+            ->favicon(asset('images/favicon.png'))
             ->discoverResources(in: app_path('Filament/Mantenimiento/Resources'), for: 'App\\Filament\\Mantenimiento\\Resources')
             ->discoverPages(in: app_path('Filament/Mantenimiento/Pages'), for: 'App\\Filament\\Mantenimiento\\Pages')
             ->pages([

@@ -33,13 +33,6 @@ class RodadosHerramientasResource extends Resource
                     ->helperText('Dejar en 0 si se debe realizar cada vez que se use')
                     ->numeric()
                     ->required(),
-                Forms\Components\Select::make('agenda_turno')
-                    ->label('Turno')
-                    ->options([
-                        'Mañana' => 'Mañana',
-                        'Tarde' => 'Tarde',
-                    ])
-                    ->required(),
                 Forms\Components\Select::make('agenda_dia')
                     ->label('Día de la semana')
                     ->options([
@@ -51,6 +44,34 @@ class RodadosHerramientasResource extends Resource
                         'Sábado' => 'Sábado',
                         'Domingo' => 'Domingo',
                     ])
+                    ->dehydrated(false),
+                Forms\Components\Select::make('agenda_turno')
+                    ->label('Turno')
+                    ->options([
+                        'Mañana' => 'Mañana',
+                        'Tarde' => 'Tarde',
+                    ])
+                    ->dehydrated(false),
+                Forms\Components\Hidden::make('agenda')
+                    ->dehydrateStateUsing(function ($state, $get) {
+                        if(!$get('agenda_dia') || !$get('agenda_turno')) {
+                            return null; // Si no hay día o turno, no se guarda nada
+                        }
+                        $dia = ucfirst(strtolower($get('agenda_dia')));
+                        $turno = ucfirst(strtolower($get('agenda_turno')));
+                        return "{'".$dia."':'".$turno."'}";
+                    })
+                    ->afterStateHydrated(function ($component, $state, $set, $get) {
+                        // Opcional: para mantener sincronizado el campo oculto al editar
+                        $dia = ucfirst(strtolower($get('agenda_dia')));
+                        $turno = ucfirst(strtolower($get('agenda_turno')));
+                        if(!$dia || !$turno) {
+                            $set('agenda', null); // Si no hay día o turno, no se guarda nada
+                        }else{
+                            $set('agenda', "{'".$dia."':'".$turno."'}");
+                        }
+                    }),
+                
             ])
             ->columns(4);
         }
@@ -59,7 +80,40 @@ class RodadosHerramientasResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('nombre')
+                    ->label('Rodado / Herramienta')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('frecuencia')
+                    ->label('Frecuencia')
+                    ->formatStateUsing(function ($state) { 
+
+                        if($state == 0) {
+
+                            return 'Cada vez que se use';
+                            
+                        } else {
+
+                            return $state . ' días';
+
+                        }
+                        
+                    }),
+                Tables\Columns\TextColumn::make('agenda')
+                    ->label('Agenda')
+                    ->formatStateUsing(function ($state) {
+                        // Espera formato: {'Día':'Turno'}
+                        $agenda = json_decode(str_replace("'",'"',$state), true);
+
+                        if (is_null($agenda)) {
+                            return '';
+                        }
+
+
+                        $diaKey = array_key_first($agenda);
+                        $turno = $agenda[$diaKey] ?? '';
+                        return $diaKey . ' de la ' . $turno;
+                    }),
             ])
             ->filters([
                 //
