@@ -16,7 +16,7 @@
             <th colspan="3" width="480px"><b style="font-size:1.1em;">REPORTE DE MANTENIMIENTO DE RODADOS Y HERRAMIENTAS</b></th>
 
         </thead>
-
+    <tr></tr>
         <tr>
             <td colspan="4" style="background-color:#000;"></td>
         </tr>
@@ -91,6 +91,12 @@
             <td style="border-right: 1px solid #000;padding:0 20px;">{{ number_format($record->km, 0, ',', '.') . ' Kms' }}</td>
             <td>{{$record->observaciones}}</td>
         </tr>
-    </table>    
+    </table>
+    
+    <div style="font-size:.8em;">
+        <h3>Firma:</h3>
+    </div>
+    <br>
+    <span style="width:250px!important;border-bottom:1px solid black">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 </body>
 </html>
