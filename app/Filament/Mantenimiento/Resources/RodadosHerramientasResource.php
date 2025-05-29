@@ -28,7 +28,7 @@ class RodadosHerramientasResource extends Resource
                     ->label('Rodado / Herramienta')
                     ->required(),
                 Forms\Components\TextInput::make('frecuencia')
-                    ->label('Frecuencia')
+                    ->label('Frecuencia de mantenimiento (en días)')
                     ->default(0)
                     ->helperText('Dejar en 0 si se debe realizar cada vez que se use')
                     ->numeric()
@@ -71,6 +71,24 @@ class RodadosHerramientasResource extends Resource
                             $set('agenda', "{'".$dia."':'".$turno."'}");
                         }
                     }),
+                Forms\Components\Group::make([
+                    Forms\Components\TextInput::make('servicesHoras')
+                        ->label('Frecuencia de services')
+                        ->default(0)
+                        ->numeric()
+                        ->required(),
+                    Forms\Components\Select::make('unidadService')
+                        ->label('Unidad')
+                        ->options([
+                            'Km' => 'Kilómetros',
+                            'Horas' => 'Horas',
+                            'Dias' => 'Días',
+                            'Meses' => 'Meses',
+                        ])
+                        ->required(),
+                ])
+                ->columnSpan(2)
+                ->columns(2),
                 
             ])
             ->columns(4);

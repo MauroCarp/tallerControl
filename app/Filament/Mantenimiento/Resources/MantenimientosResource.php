@@ -47,12 +47,67 @@ class MantenimientosResource extends Resource
                     ->label('Rodado/Herramienta')
                     ->options(\App\Models\RodadosHerramientas::all()->pluck('nombre', 'id'))
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    ->createOptionForm([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Rodado / Herramienta')
+                            ->required(),
+                        Forms\Components\TextInput::make('frecuencia')
+                            ->label('Frecuencia')
+                            ->default(0)
+                            ->helperText('Dejar en 0 si se debe realizar cada vez que se use')
+                            ->numeric()
+                            ->required(),
+                        Forms\Components\Select::make('agenda_dia')
+                            ->label('Día de la semana')
+                            ->options([
+                                'Lunes' => 'Lunes',
+                                'Martes' => 'Martes',
+                                'Miércoles' => 'Miércoles',
+                                'Jueves' => 'Jueves',
+                                'Viernes' => 'Viernes',
+                                'Sábado' => 'Sábado',
+                                'Domingo' => 'Domingo',
+                            ])
+                            ->dehydrated(false),
+                        Forms\Components\Select::make('agenda_turno')
+                            ->label('Turno')
+                            ->options([
+                                'Mañana' => 'Mañana',
+                                'Tarde' => 'Tarde',
+                            ])
+                            ->dehydrated(false),
+                        Forms\Components\Hidden::make('agenda')
+                            ->dehydrateStateUsing(function ($state, $get) {
+                                if(!$get('agenda_dia') || !$get('agenda_turno')) {
+                                    return null; // Si no hay día o turno, no se guarda nada
+                                }
+                                $dia = ucfirst(strtolower($get('agenda_dia')));
+                                $turno = ucfirst(strtolower($get('agenda_turno')));
+                                return "{'".$dia."':'".$turno."'}";
+                            })
+                            ->afterStateHydrated(function ($component, $state, $set, $get) {
+                                // Opcional: para mantener sincronizado el campo oculto al editar
+                                $dia = ucfirst(strtolower($get('agenda_dia')));
+                                $turno = ucfirst(strtolower($get('agenda_turno')));
+                                if(!$dia || !$turno) {
+                                    $set('agenda', null); // Si no hay día o turno, no se guarda nada
+                                }else{
+                                    $set('agenda', "{'".$dia."':'".$turno."'}");
+                                }
+                            }),                
+                        ])
+                    ->createOptionUsing(function (array $data): int {
+                        $rodado = RodadosHerramientas::create(['nombre' => $data['nombre'],
+                            'frecuencia' => $data['frecuencia'],
+                            'agenda' => $data['agenda'],
+                        ]);
+                        return $rodado->id;
+                    }),
                 Forms\Components\TextInput::make('horasMotor')
                     ->label('Horas Motor')
                     ->numeric()
                     ->required(),
-
                 Forms\Components\TextInput::make('km')
                     ->label('Kilómetros')
                     ->numeric()
@@ -114,6 +169,7 @@ class MantenimientosResource extends Resource
                             ->when($data['from'], fn ($q) => $q->whereDate('fecha', '>=', $data['from']))
                             ->when($data['until'], fn ($q) => $q->whereDate('fecha', '<=', $data['until']));
                     }),
+                    
             ])
             ->actions([
             Tables\Actions\Action::make('download_pdf')
