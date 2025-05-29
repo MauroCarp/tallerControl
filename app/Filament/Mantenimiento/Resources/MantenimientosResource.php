@@ -6,6 +6,7 @@ use App\Filament\Mantenimiento\Resources\MantenimientosResource\Pages;
 use App\Filament\Mantenimiento\Resources\MantenimientosResource\RelationManagers;
 use App\Models\MantenimientosHerramientas;
 use App\Models\Mantenimientosservices;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -95,16 +96,36 @@ class MantenimientosResource extends Resource
                     ->formatStateUsing(function ($state) {
                         return \App\Models\RodadosHerramientas::find($state)?->nombre ?? '';
                     }),
-
                 Tables\Columns\TextColumn::make('responsable')
                     ->label('Responsables')
                     ->sortable()
                     ->searchable(),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('fecha')
+                    ->form([
+                        Forms\Components\DatePicker::make('from')
+                            ->label('Desde'),
+                        Forms\Components\DatePicker::make('until')
+                            ->label('Hasta'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query
+                            ->when($data['from'], fn ($q) => $q->whereDate('fecha', '>=', $data['from']))
+                            ->when($data['until'], fn ($q) => $q->whereDate('fecha', '<=', $data['until']));
+                    }),
             ])
             ->actions([
+            Tables\Actions\Action::make('download_pdf')
+                ->label('Reporte')
+                ->icon('heroicon-o-document-arrow-down')
+                ->action(function ($record) {
+                    $pdf = Pdf::loadView('pdf.mantenimiento', ['record' => $record]);
+                    return response()->streamDownload(
+                        fn () => print($pdf->output()),
+                        'Reporte_Mantenimiento'.$record->fecha.'.pdf'
+                    );
+                }),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
