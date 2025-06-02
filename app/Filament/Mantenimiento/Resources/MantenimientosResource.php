@@ -6,6 +6,7 @@ use App\Filament\Mantenimiento\Resources\MantenimientosResource\Pages;
 use App\Filament\Mantenimiento\Resources\MantenimientosResource\RelationManagers;
 use App\Models\MantenimientosHerramientas;
 use App\Models\Mantenimientosservices;
+use App\Models\RodadosHerramientas;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -129,9 +130,11 @@ class MantenimientosResource extends Resource
                     ->columnSpan(2)
                     ->required()
                     ->dehydrateStateUsing(fn ($state) => json_encode($state)),
-                Forms\Components\TextInput::make('observaciones')
+                Forms\Components\Textarea::make('observaciones')
                     ->label('Observaciones')
                     ->nullable(),
+                Forms\Components\Hidden::make('isMantenimiento')
+                    ->default(1),
             ])->columns(3);
     }
 

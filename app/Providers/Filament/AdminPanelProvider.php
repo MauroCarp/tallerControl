@@ -40,6 +40,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->sidebarWidth('13rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->resources([
+                \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,
+            ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,

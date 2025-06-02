@@ -47,6 +47,9 @@ class MantenimientoPanelProvider extends PanelProvider
                 CronogramaMantenimientos::class,
                 MantenimientosList::class,
             ])
+            ->resources([
+                \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

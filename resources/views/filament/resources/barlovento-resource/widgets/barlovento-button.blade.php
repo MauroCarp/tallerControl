@@ -13,7 +13,7 @@
             </x-filament::button>
 
             <x-filament::button tag="a" 
-            href="/admin/service/index" 
+            href="service" 
             id="btnService"
             class="w-full" style="font-size:2em;padding: 1em 1em;">
             SERVICE

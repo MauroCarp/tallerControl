@@ -72,7 +72,7 @@ class RodadosHerramientasResource extends Resource
                         }
                     }),
                 Forms\Components\Group::make([
-                    Forms\Components\TextInput::make('servicesHoras')
+                    Forms\Components\TextInput::make('serviceHoras')
                         ->label('Frecuencia de services')
                         ->default(0)
                         ->numeric()
@@ -103,7 +103,7 @@ class RodadosHerramientasResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('frecuencia')
-                    ->label('Frecuencia')
+                    ->label('Frecuencia de Mantenimiento')
                     ->formatStateUsing(function ($state) { 
 
                         if($state == 0) {
@@ -132,12 +132,37 @@ class RodadosHerramientasResource extends Resource
                         $turno = $agenda[$diaKey] ?? '';
                         return $diaKey . ' de la ' . $turno;
                     }),
+                Tables\Columns\TextColumn::make('agenda')
+                    ->label('Agenda')
+                    ->formatStateUsing(function ($state) {
+                        // Espera formato: {'Día':'Turno'}
+                        $agenda = json_decode(str_replace("'",'"',$state), true);
+
+                        if (is_null($agenda)) {
+                            return '';
+                        }
+
+
+                        $diaKey = array_key_first($agenda);
+                        $turno = $agenda[$diaKey] ?? '';
+                        return $diaKey . ' de la ' . $turno;
+                    }),
+                Tables\Columns\TextColumn::make('serviceHoras')
+                    ->label('Frecuencia de Service')
+                    ->formatStateUsing(function ($state, $record) {
+                        if($state == 0) {
+                            return '';
+                        } else {
+                            return number_format($state,0,',','.') . ' ' . $record->unidadService;
+                        }
+                    }),
             ])
             ->filters([
-                //
+                //  
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
