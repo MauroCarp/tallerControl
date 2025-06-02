@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Reporte de Mantenimiento</title>
+    <title>Reporte Service</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; }
         /* Tu estilo personalizado aquí */
@@ -13,7 +13,7 @@
     <table style="font-size:.8em;">
         <thead>
             <th width="180px"><img src="{{ public_path('images/barlovento-logo.png') }}" alt="Logo" width="150px"></th>
-            <th colspan="3" width="480px"><b style="font-size:1.1em;">REPORTE DE MANTENIMIENTO DE RODADOS Y HERRAMIENTAS</b></th>
+            <th colspan="3" width="480px"><b style="font-size:1.1em;">REPORTE SERVICE RODADOS</b></th>
 
         </thead>
     <tr></tr>
@@ -53,15 +53,13 @@
         @php
             $tareas = json_decode($record->tareas, true);
             $listaTareas = [
-                        1 => 'Nivel de agua refrigerante',
-                        2 => 'Presion de los neumaticos',
-                        3 => 'Lubricacion/Engrasado completo',
-                        4 => 'Nivel de aceite de motor',
-                        5 => 'Nivel de aceite de transmision',
-                        6 => 'Nivel de aceite reductoras',
-                        7 => 'Limpiado/Sopleteado radiadores y filtro de aire',
-                        8 => 'Limpiado/Sopleteado de cabina',
-                        9 => 'Lavado del mismo si es necesario',];
+                        1 => 'Cambio Aceite de Motor',
+                        2 => 'Cambio de Filtro de Aceite',
+                        3 => 'Cambio de Filtro de Combustible',
+                        4 => 'Cambio de Filtro de Aire',
+                        5 => 'Cambio de Filtro de Habitaculo',
+                        6 => 'Cambio de Aceite de Transmision',
+                        ];
         @endphp
         @foreach ($listaTareas as $index => $item)
             <tr style="font-size:.8em;"> 
@@ -97,6 +95,9 @@
         </tr>
     </table>
     
+    <div style="font-size:.8em;">
+        <h3>Proximo Service:</h3>
+    </div>
     <div style="font-size:.8em;">
         <h3>Firma:</h3>
     </div>
