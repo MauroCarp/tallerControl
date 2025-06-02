@@ -6,7 +6,6 @@ use App\Filament\Service\Resources\ServicesResource\Pages;
 use App\Filament\Service\Resources\ServicesResource\RelationManagers;
 use App\Models\Mantenimientosservices;
 use App\Models\RodadosHerramientas;
-use App\Models\Services;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,7 +18,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class ServicesResource extends Resource
 {
     protected static ?string $model = Mantenimientosservices::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationLabel = 'Services'; // Nombre del enlace
     protected static ?string $breadcrumb = 'Gestión de Services';
@@ -138,9 +136,7 @@ class ServicesResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(function (Builder $query) {
-                return $query->where('isMantenimiento', 0);
-            })
+            ->query(static::getModel()::query()->where('isMantenimiento', '0'))
             ->columns([
                 Tables\Columns\TextColumn::make('fecha')
                     ->label('Fecha')

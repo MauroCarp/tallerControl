@@ -141,6 +141,7 @@ class MantenimientosResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(static::getModel()::query()->where('isMantenimiento', '1'))
             ->columns([
                 Tables\Columns\TextColumn::make('fecha')
                     ->label('Fecha')

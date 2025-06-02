@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Service\Widgets\CronogramaService;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -11,7 +10,8 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
-use App\Filament\Service\Widgets\CronogramaServices;
+use App\Filament\Widgets\ServiceList;
+use App\Filament\Widgets\CronogramaService;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -28,7 +28,7 @@ class ServicePanelProvider extends PanelProvider
             ->id('service')
             ->path('service')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Indigo,
             ])
             ->discoverResources(in: app_path('Filament/Service/Resources'), for: 'App\\Filament\\Service\\Resources')
             ->discoverPages(in: app_path('Filament/Service/Pages'), for: 'App\\Filament\\Service\\Pages')
@@ -38,7 +38,7 @@ class ServicePanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Service/Widgets'), for: 'App\\Filament\\Service\\Widgets')
             ->widgets([
                 CronogramaService::class,
-                // ServicesList::class,
+                ServiceList::class,
             ])
             ->middleware([
                 EncryptCookies::class,

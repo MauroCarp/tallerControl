@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Service\Widgets;
+namespace App\Filament\Widgets;
 
 use App\Models\RodadosHerramientas;
 use Filament\Tables;
