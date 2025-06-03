@@ -9,6 +9,7 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
 use App\Filament\Widgets\ServiceList;
 use App\Filament\Widgets\CronogramaService;
@@ -18,6 +19,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\App;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class ServicePanelProvider extends PanelProvider
@@ -27,6 +29,8 @@ class ServicePanelProvider extends PanelProvider
         return $panel
             ->id('service')
             ->path('service')
+            ->brandLogo(asset('images/barlovento-logo.png'))
+            ->favicon(asset('images/favicon.png'))
             ->colors([
                 'primary' => Color::Indigo,
             ])
@@ -40,6 +44,9 @@ class ServicePanelProvider extends PanelProvider
                 CronogramaService::class,
                 ServiceList::class,
             ])
+            ->resources([
+                \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,
+            ])  
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
