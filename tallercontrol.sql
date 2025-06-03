@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 28-05-2025 a las 19:34:15
+-- Tiempo de generación: 03-06-2025 a las 19:40:31
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -63,6 +63,33 @@ CREATE TABLE IF NOT EXISTS `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `insumos`
+--
+
+DROP TABLE IF EXISTS `insumos`;
+CREATE TABLE IF NOT EXISTS `insumos` (
+  `id` bigint UNSIGNED DEFAULT NULL,
+  `insumo` varchar(10) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `establecimiento` date NOT NULL,
+  `cereal` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `cartaPorte` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `vendedor` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `pesoBruto` double(8,2) DEFAULT NULL,
+  `tara` double(8,2) DEFAULT NULL,
+  `humedad` int DEFAULT NULL,
+  `mermaHumedad` int DEFAULT NULL,
+  `calidad` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `materiasExtraneas` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `tierra` tinyint(1) DEFAULT NULL,
+  `destino` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `observaciones` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `mantenimientosservices`
 --
 
@@ -76,19 +103,20 @@ CREATE TABLE IF NOT EXISTS `mantenimientosservices` (
   `tareas` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `horasMotor` int NOT NULL,
   `km` int NOT NULL,
-  `observaciones` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `combustible` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `observaciones` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isMantenimiento` tinyint(1) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `mantenimientosservices`
 --
 
-INSERT INTO `mantenimientosservices` (`id`, `fecha`, `rodadoHerramienta_id`, `responsable`, `turno`, `tareas`, `horasMotor`, `km`, `observaciones`, `combustible`, `created_at`, `updated_at`) VALUES
-(1, '2025-05-28', 2, 'Mauro', 'Mañana', '[\"1\",\"2\",\"4\",\"8\",\"7\"]', 2500, 25000, NULL, NULL, '2025-05-28 21:47:12', '2025-05-28 21:47:12');
+INSERT INTO `mantenimientosservices` (`id`, `fecha`, `rodadoHerramienta_id`, `responsable`, `turno`, `tareas`, `horasMotor`, `km`, `observaciones`, `isMantenimiento`, `created_at`, `updated_at`) VALUES
+(1, '2025-05-28', 2, 'Mauro', 'Mañana', '[\"1\",\"2\",\"4\",\"8\",\"7\"]', 2500, 25000, NULL, 1, '2025-05-28 21:47:12', '2025-05-28 21:47:12'),
+(2, '2025-06-02', 5, 'mAURO', 'Mañana', '[\"1\",\"2\",\"6\"]', 5000, 25000, NULL, 0, '2025-06-02 17:25:23', '2025-06-02 17:25:23');
 
 -- --------------------------------------------------------
 
@@ -169,13 +197,21 @@ CREATE TABLE IF NOT EXISTS `reparaciones` (
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `operario` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `encargado` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `descripcionReparacion` varchar(250) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tipo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `importe` double(8,2) NOT NULL,
-  `horas` int NOT NULL,
+  `importe` float DEFAULT NULL,
+  `horas` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `reparaciones`
+--
+
+INSERT INTO `reparaciones` (`id`, `fecha`, `rodadoHerramienta_id`, `descripcion`, `operario`, `encargado`, `descripcionReparacion`, `tipo`, `importe`, `horas`, `created_at`, `updated_at`) VALUES
+(1, '2025-06-03', 1, 'Corte de cadena', 'Prueba operario', 'Prueba Encargado', 'Se reemplaza por cadena nueva', 'Propia', NULL, 2, '2025-06-03 22:25:03', '2025-06-03 22:25:03');
 
 -- --------------------------------------------------------
 
@@ -188,9 +224,10 @@ CREATE TABLE IF NOT EXISTS `rodados_herramientas` (
   `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT,
   `nombre` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `frecuencia` int NOT NULL,
-  `agenda` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `agenda` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `serviceHoras` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
+  `unidadService` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -199,19 +236,19 @@ CREATE TABLE IF NOT EXISTS `rodados_herramientas` (
 -- Volcado de datos para la tabla `rodados_herramientas`
 --
 
-INSERT INTO `rodados_herramientas` (`id`, `nombre`, `frecuencia`, `agenda`, `serviceHoras`, `created_at`, `updated_at`) VALUES
-(1, 'Cuatriciclo', 7, '{\'Martes\':\'Tarde\'}', 0, '2025-05-28 15:42:15', '2025-05-28 15:42:15'),
-(2, 'Massey 630', 7, '{\'Martes\':\'Tarde\'}', 0, '2025-05-28 15:42:38', '2025-05-28 15:42:38'),
-(3, 'Massey 6712', 7, '{\'Miércoles\':\'Tarde\'}', 0, '2025-05-28 15:42:51', '2025-05-28 15:42:51'),
-(4, 'Mixer', 7, '{\'Jueves\':\'Tarde\'}', 0, '2025-05-28 15:43:05', '2025-05-28 15:43:05'),
-(5, 'Valtra', 7, '{\'Jueves\':\'Tarde\'}', 0, '2025-05-28 15:43:28', '2025-05-28 15:43:28'),
-(6, 'Michigan', 7, '{\'Viernes\':\'Tarde\'}', 0, '2025-05-28 15:43:41', '2025-05-28 15:43:41'),
-(7, 'Deutz', 14, '{\'Lunes\':\'Tarde\'}', 0, '2025-05-28 15:44:00', '2025-05-28 15:44:00'),
-(8, 'Toyota de oficina', 14, '{\'Lunes\':\'Tarde\'}', 0, '2025-05-28 15:49:56', '2025-05-28 15:49:56'),
-(9, 'Pauny', 14, '{\'Lunes\':\'Tarde\'}', 0, '2025-05-28 15:50:10', '2025-05-28 15:50:10'),
-(10, 'Generador', 30, '{\'Lunes\':\'Mañana\'}', 0, '2025-05-28 18:56:18', '2025-05-28 18:56:18'),
-(11, 'Embolsadora', 0, NULL, 0, '2025-05-28 18:58:59', '2025-05-28 18:58:59'),
-(13, 'Moscato', 0, NULL, 0, '2025-05-28 20:13:31', '2025-05-28 20:13:31');
+INSERT INTO `rodados_herramientas` (`id`, `nombre`, `frecuencia`, `agenda`, `serviceHoras`, `created_at`, `unidadService`, `updated_at`) VALUES
+(1, 'Cuatriciclo', 7, '{\'Martes\':\'Tarde\'}', 5000, '2025-05-28 15:42:15', 'Horas', '2025-05-31 01:42:13'),
+(2, 'Massey 630', 7, '{\'Martes\':\'Tarde\'}', 300, '2025-05-28 15:42:38', 'Horas', '2025-05-28 15:42:38'),
+(3, 'Massey 6712', 7, '{\'Miércoles\':\'Tarde\'}', 300, '2025-05-28 15:42:51', 'Horas', '2025-05-28 15:42:51'),
+(4, 'Mixer', 7, '{\'Jueves\':\'Tarde\'}', 0, '2025-05-28 15:43:05', '0', '2025-05-28 15:43:05'),
+(5, 'Valtra', 7, '{\'Jueves\':\'Tarde\'}', 300, '2025-05-28 15:43:28', 'Horas', '2025-05-28 15:43:28'),
+(6, 'Michigan', 7, '{\'Viernes\':\'Tarde\'}', 300, '2025-05-28 15:43:41', 'Horas', '2025-05-28 15:43:41'),
+(7, 'Deutz', 14, '{\'Lunes\':\'Tarde\'}', 300, '2025-05-28 15:44:00', 'Horas', '2025-05-28 15:44:00'),
+(8, 'Toyota de oficina', 14, '{\'Lunes\':\'Tarde\'}', 10000, '2025-05-28 15:49:56', 'Km', '2025-05-28 15:49:56'),
+(9, 'Pauny', 14, '{\'Lunes\':\'Tarde\'}', 300, '2025-05-28 15:50:10', 'Horas', '2025-05-28 15:50:10'),
+(10, 'Generador', 30, '{\'Lunes\':\'Mañana\'}', 2, '2025-05-28 18:56:18', 'Meses', '2025-05-28 18:56:18'),
+(11, 'Embolsadora', 0, NULL, 0, '2025-05-28 18:58:59', '0', '2025-05-28 18:58:59'),
+(13, 'Moscato', 0, NULL, 0, '2025-05-28 20:13:31', '0', '2025-05-28 20:13:31');
 
 -- --------------------------------------------------------
 
@@ -238,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'Mauro', 'mauro@mauro.com', NULL, '$2y$10$t8xmZ9fo7l93Bkoz4E1mgebKKf03jTjhJ9lD2.IKG6lbq8gEzATKO', NULL, '2025-05-28 14:33:34', '2025-05-28 14:33:34');
+(1, 'Mauro', 'mauro@mauro.com', NULL, '$2y$10$t8xmZ9fo7l93Bkoz4E1mgebKKf03jTjhJ9lD2.IKG6lbq8gEzATKO', 'PCHZ3f9Hs2SHQEbWuScL6KFwO90agGRKgxmhCeJnaIl8xTQnnl7wz0cKB9Wr', '2025-05-28 14:33:34', '2025-05-28 14:33:34');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
