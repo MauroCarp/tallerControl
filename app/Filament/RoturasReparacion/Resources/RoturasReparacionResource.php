@@ -5,6 +5,8 @@ namespace App\Filament\RoturasReparacion\Resources;
 use App\Filament\RoturasReparacion\Resources\RoturasReparacionResource\Pages;
 use App\Filament\RoturasReparacion\Resources\RoturasReparacionResource\RelationManagers;
 use App\Models\Reparaciones;
+use App\Models\RodadosHerramientas;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,6 +15,8 @@ use Filament\Tables\Table;
 use Filament\Tables\Filters\TextFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Colors\Color;
 
 class RoturasReparacionResource extends Resource
 {
@@ -198,8 +202,10 @@ class RoturasReparacionResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label(''),
-                Tables\Actions\EditAction::make()->label(''),
+                Tables\Actions\ViewAction::make()
+                ->label('')->color(Color::Indigo),
+                Tables\Actions\EditAction::make()
+                ->label(''),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('download_filtered_pdf')
@@ -236,7 +242,7 @@ class RoturasReparacionResource extends Resource
 
                         // Obtener los registros filtrados
                         $records = $query->get();
-                        $pdf = \Pdf::loadView('pdf.roturasReparaciones', ['records' => $records])->setPaper('a4', 'landscape');
+                        $pdf = Pdf::loadView('pdf.roturasReparaciones', ['records' => $records])->setPaper('a4', 'landscape');
                         return response()->streamDownload(
                             fn () => print($pdf->output()),
                             'Reporte_RoturasReparaciones_Filtrado.pdf'
@@ -248,6 +254,36 @@ class RoturasReparacionResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                TextEntry::make('fecha')
+                    ->label('Fecha')
+                    ->date('d/m/Y'),
+                TextEntry::make('rodadoHerramienta_id')
+                    ->label('Rodado/Herramienta')
+                    ->formatStateUsing(function ($state) {
+                        return RodadosHerramientas::find($state)?->nombre ?? '';
+                    }),
+                TextEntry::make('encargado')
+                    ->label('Encargado'),
+                TextEntry::make('descripcion')
+                    ->label('Descripción de la Rotura'),
+                TextEntry::make('operario')
+                    ->label('Operario a Cargo'),
+                TextEntry::make('descripcionReparacion')
+                    ->label('Descripción de la Reparación'),
+                TextEntry::make('tipo')
+                    ->label('Tipo de Trabajo'),
+                TextEntry::make('importe')
+                    ->label('Importe')
+                    ->visible(fn ($record) => $record->tipo === 'Tercerizado'),
+                TextEntry::make('horas')
+                    ->label('Horas')
+                    ->visible(fn ($record) => $record->tipo !== 'Tercerizado'),
             ]);
     }
 

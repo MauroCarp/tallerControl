@@ -10,9 +10,11 @@ use App\Models\RodadosHerramientas;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Support\Colors\Color;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -176,8 +178,12 @@ class MantenimientosResource extends Resource
                     
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                ->label('')->color(Color::Indigo),
+                Tables\Actions\EditAction::make()
+                ->label(''),
             Tables\Actions\Action::make('download_pdf')
-                ->label('Reporte')
+                ->label('')
                 ->icon('heroicon-o-document-arrow-down')
                 ->action(function ($record) {
                     $pdf = Pdf::loadView('pdf.mantenimiento', ['record' => $record]);
@@ -186,7 +192,6 @@ class MantenimientosResource extends Resource
                         'Reporte_Mantenimiento'.$record->fecha.'.pdf'
                     );
                 }),
-                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -194,7 +199,58 @@ class MantenimientosResource extends Resource
                 ]),
             ]);
     }
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                TextEntry::make('fecha')
+                    ->label('Fecha')
+                    ->date('d/m/Y'),
 
+                TextEntry::make('responsable')
+                    ->label('Responsables'),
+
+                TextEntry::make('turno')
+                    ->label('Turno'),
+
+                TextEntry::make('rodadoHerramienta.nombre')
+                    ->label('Rodado/Herramienta'),
+
+                TextEntry::make('horasMotor')
+                    ->label('Horas Motor'),
+
+                TextEntry::make('km')
+                    ->label('Kilómetros'),
+
+                TextEntry::make('tareas')
+                    ->label('Tareas')
+                    ->formatStateUsing(function ($state) {
+                        $tareas = [
+                            1 => 'Nivel de agua refrigerante',
+                            2 => 'Presion de los neumaticos',
+                            3 => 'Lubricacion/Engrasado completo',
+                            4 => 'Nivel de aceite de motor',
+                            5 => 'Nivel de aceite de transmision',
+                            6 => 'Nivel de aceite reductoras',
+                            7 => 'Limpiado/Sopleteado radiadores y filtro de aire',
+                            8 => 'Limpiado/Sopleteado de cabina',
+                            9 => 'Lavado del mismo si es necesario',
+                        ];
+                        $selected = json_decode($state, true) ?? [];
+                        $result = '';
+                        foreach ($selected as $id) {
+                            if (isset($tareas[$id])) {
+                                $result .= $id . ' - ' . $tareas[$id] . '<br>';
+                            }
+                        }
+                        return $result;
+                    })
+                    ->html(),
+
+                TextEntry::make('observaciones')
+                    ->label('Observaciones'),
+            ]);
+    }
     public static function getRelations(): array
     {
         return [

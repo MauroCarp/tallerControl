@@ -7,8 +7,10 @@ use App\Filament\Mantenimiento\Resources\RodadosHerramientasResource\RelationMan
 use App\Models\RodadosHerramientas;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Support\Colors\Color;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -170,7 +172,50 @@ class RodadosHerramientasResource extends Resource
                 ]),
             ]);
     }
-
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                TextEntry::make('nombre')
+                    ->label('Rodado / Herramienta'),
+                TextEntry::make('frecuencia')
+                    ->label('Frecuencia de mantenimiento (en días)')
+                    ->formatStateUsing(function ($state) {
+                        return $state == 0 ? 'Cada vez que se use' : $state . ' días';
+                    }),
+                TextEntry::make('agenda')
+                    ->label('Agenda')
+                    ->formatStateUsing(function ($state) {
+                        $agenda = json_decode(str_replace("'",'"',$state), true);
+                        if (is_null($agenda)) {
+                            return '';
+                        }
+                        $diaKey = array_key_first($agenda);
+                        $turno = $agenda[$diaKey] ?? '';
+                        return $diaKey . ' de la ' . $turno;
+                    }),
+                TextEntry::make('serviceHoras')
+                    ->label('Frecuencia de services')
+                    ->formatStateUsing(function ($state, $record) {
+                        if ($state == 0) {
+                            return '';
+                        }
+                        return number_format($state, 0, ',', '.') . ' ' . $record->unidadService;
+                    }),
+                TextEntry::make('unidadService')
+                    ->label('Unidad')
+                    ->formatStateUsing(function ($state) {
+                        $map = [
+                            'Km' => 'Kilómetros',
+                            'Horas' => 'Horas',
+                            'Dias' => 'Días',
+                            'Meses' => 'Meses',
+                        ];
+                        return $map[$state] ?? $state;
+                    }),
+            ]);
+    }
+    
     public static function getRelations(): array
     {
         return [

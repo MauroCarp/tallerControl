@@ -3,8 +3,10 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Reparaciones;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Support\Colors\Color;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 
@@ -12,7 +14,7 @@ class ReparacionesPropiasList extends BaseWidget
 {
     protected static ?string $panel = 'roturasReparacion';
 
-    protected static ?string $heading = 'Roturas/Reparaciones Propias';
+    protected static ?string $heading = 'PROPIAS';
 
     // Puedes cambiar esto si necesitas mostrar en el dashboard
     protected int|string|array $columnSpan = 'half';
@@ -46,7 +48,7 @@ class ReparacionesPropiasList extends BaseWidget
             ])->paginated(false)
             ->actions([
             Tables\Actions\Action::make('download_pdf')
-                ->label('Reporte')
+                ->label('')
                 ->icon('heroicon-o-document-arrow-down')
                 ->action(function ($record) {
                     $pdf = Pdf::loadView('pdf.mantenimiento', ['record' => $record]);
@@ -55,7 +57,7 @@ class ReparacionesPropiasList extends BaseWidget
                         'Reporte_Mantenimiento'.$record->fecha.'.pdf'
                     );
                 }),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->label('')->color(Color::Indigo),
             ]);
     }
 }

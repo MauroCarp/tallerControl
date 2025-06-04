@@ -52,7 +52,7 @@
                 @endif
             >
                 @if ($homeUrl = filament()->getHomeUrl())
-                <a href="admin">
+                <a href="../admin">
                         <x-filament-panels::logo />
                     </a>
                 @else
