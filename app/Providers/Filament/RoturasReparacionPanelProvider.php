@@ -11,6 +11,8 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
+use App\Filament\Widgets\ReparacionesPropiasList;
+use App\Filament\Widgets\ReparacionesTercierizadasList;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -29,6 +31,7 @@ class RoturasReparacionPanelProvider extends PanelProvider
             ->path('roturasReparacion')
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
+            ->maxContentWidth('full')
             ->colors([
                 'primary' => Color::Indigo,
             ])
@@ -37,10 +40,10 @@ class RoturasReparacionPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/RoturasReparacion/Widgets'), for: 'App\\Filament\\RoturasReparacion\\Widgets')
+            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // ReparacionesPropiasList::class,
-                // ReparacionesTercierizadasList::class,
+                ReparacionesPropiasList::class,
+                ReparacionesTercierizadasList::class,
             ])
             ->resources([
                 \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,

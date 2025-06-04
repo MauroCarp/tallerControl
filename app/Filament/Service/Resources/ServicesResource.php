@@ -178,7 +178,7 @@ class ServicesResource extends Resource
                     $pdf = Pdf::loadView('pdf.service', ['record' => $record]);
                     return response()->streamDownload(
                         fn () => print($pdf->output()),
-                        'Reporte_Mantenimiento'.$record->fecha.'.pdf'
+                        'Reporte_Service'.$record->fecha.'.pdf'
                     );
                 }),
                 Tables\Actions\EditAction::make(),

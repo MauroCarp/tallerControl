@@ -111,7 +111,7 @@ class RoturasReparacionResource extends Resource
                     ->default('Propio')
                     ->options([
                         'Propio' => 'Propio',
-                        'Tercerizado' => 'Tercerizado',
+                        'Tercierizado' => 'Tercierizado',
                     ])
                     ->reactive()
                     ->searchable(),
@@ -198,7 +198,51 @@ class RoturasReparacionResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->label(''),
+                Tables\Actions\EditAction::make()->label(''),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('download_filtered_pdf')
+                    ->label('Reporte Filtrado')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->action(function (Tables\Actions\Action $action) {
+                        // Obtener los filtros seleccionados
+                        $filters = $action->getTable()->getFilters();
+                 
+                        // Construir la consulta base
+                        $query = \App\Models\Reparaciones::query();
+
+                        // Aplicar filtros manualmente según los valores seleccionados
+                        if (!empty($filters['fecha']->getState()[0])) {
+                            $query->whereDate('fecha', '>=', $filters['fecha']->getState()[0]);
+                        }
+                        if (!empty($filters['fecha']->getState()[1])) {
+                            $query->whereDate('fecha', '<=', $filters['fecha']->getState()[1]);
+                        }
+                        if (!empty($filters['rodadoHerramienta_id']->getState()[0])) {
+                            $query->where('rodadoHerramienta_id', $filters['rodadoHerramienta_id']->getState()[0]);
+                        }
+                        if (!empty($filters['encargado']->getState()[0])) {
+                            $query->where('encargado', 'like', '%' . $filters['encargado']->getState()[0] . '%');
+                        }
+                        if (!empty($filters['operario']->getState()[0])) {
+                            $query->where('operario', 'like', '%' . $filters['operario']->getState()[0] . '%');
+                        }
+                        if (!empty($filters['tipo']->getState()[0])) {
+                            $query->where('tipo', $filters['tipo']->getState()[0]);
+                        }
+
+                        $query->orderBy('fecha', 'desc');
+
+                        // Obtener los registros filtrados
+                        $records = $query->get();
+                        $pdf = \Pdf::loadView('pdf.roturasReparaciones', ['records' => $records])->setPaper('a4', 'landscape');
+                        return response()->streamDownload(
+                            fn () => print($pdf->output()),
+                            'Reporte_RoturasReparaciones_Filtrado.pdf'
+                        );
+                    }),
+                Tables\Actions\CreateAction::make()->label('Nuevo Registro'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

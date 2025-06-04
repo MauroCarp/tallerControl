@@ -12,16 +12,7 @@ class ListRoturasReparacions extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\CreateAction::make()
-            ->label('Nuevo Registro'), // Cambia este texto al deseado
-        ];
-    }
-
-    public function getTitle(): string
-    {
-        return 'Roturas / Reparaciones'; // Cambia este texto al título deseado
-
+        return [];
     }
 
     public function getBreadcrumb(): string
