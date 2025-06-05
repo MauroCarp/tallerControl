@@ -15,8 +15,15 @@ class ListRoturasReparacions extends ListRecords
         return [];
     }
 
+
+        public function getTitle(): string
+    {
+        return ' '; // Cambia este texto al título deseado
+
+    }
+
     public function getBreadcrumb(): string
     {
-        return 'Roturas / Reparaciones'; // Cambia este texto al título deseado
+        return 'Listado'; // Cambia este texto al título deseado
     }
 }

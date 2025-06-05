@@ -9,13 +9,17 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
+use App\Filament\Widgets\ServiceList;
+use App\Filament\Widgets\CronogramaService;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\App;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class CombustiblesLubricantesPanelProvider extends PanelProvider
@@ -25,7 +29,7 @@ class CombustiblesLubricantesPanelProvider extends PanelProvider
         return $panel
             ->id('combustiblesLubricantes')
             ->path('combustiblesLubricantes')
-             ->brandLogo(asset('images/barlovento-logo.png'))
+            ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
             ->brandName('Control de Taller')
             ->colors([
@@ -37,9 +41,12 @@ class CombustiblesLubricantesPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                CronogramaService::class,
+                ServiceList::class,
             ])
+            ->resources([
+                \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,
+            ])  
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

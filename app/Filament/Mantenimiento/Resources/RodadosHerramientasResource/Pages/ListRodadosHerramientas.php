@@ -20,7 +20,7 @@ class ListRodadosHerramientas extends ListRecords
 
     public function getTitle(): string
     {
-        return 'Rodados / Herramientas'; // Cambia este texto al título deseado
+        return ' '; // Cambia este texto al título deseado
 
     }
 

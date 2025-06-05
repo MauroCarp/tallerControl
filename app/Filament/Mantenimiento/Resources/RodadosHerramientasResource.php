@@ -22,6 +22,7 @@ class RodadosHerramientasResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-truck';
     protected static ?string $navigationLabel = 'Rodados / Herramientas'; // Nombre del enlace
 
+
     public static function form(Form $form): Form
     {
         return $form

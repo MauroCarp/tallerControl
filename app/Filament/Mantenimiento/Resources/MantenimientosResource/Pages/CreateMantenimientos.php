@@ -12,7 +12,7 @@ class CreateMantenimientos extends CreateRecord
 
     public function getTitle(): string
     {
-        return 'Nuevo Mantenimiento'; // Cambia este texto al título deseado
+        return ' '; // Cambia este texto al título deseado
 
     }
 

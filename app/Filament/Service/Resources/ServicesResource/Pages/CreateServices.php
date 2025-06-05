@@ -12,7 +12,7 @@ class CreateServices extends CreateRecord
 
     public function getTitle(): string
     {
-        return 'Nuevo Service'; // Cambia este texto al título deseado
+        return ' '; // Cambia este texto al título deseado
 
     }
 

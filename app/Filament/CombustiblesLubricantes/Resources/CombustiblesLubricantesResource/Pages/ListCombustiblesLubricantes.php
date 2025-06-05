@@ -12,8 +12,18 @@ class ListCombustiblesLubricantes extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        return [
-            Actions\CreateAction::make(),
-        ];
+        return [];
     }
+
+    public function getTitle(): string
+    {
+        return ' '; // Cambia este texto al título deseado
+
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Listado'; // Cambia este texto al breadcrumb deseado
+    }
+    
 }

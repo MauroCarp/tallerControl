@@ -31,6 +31,7 @@ class ServicePanelProvider extends PanelProvider
             ->path('service')
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
+            ->brandName('Control de Taller')
             ->colors([
                 'primary' => Color::Indigo,
             ])

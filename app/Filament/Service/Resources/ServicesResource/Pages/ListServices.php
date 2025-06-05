@@ -21,12 +21,12 @@ class ListServices extends ListRecords
 
     public function getTitle(): string
     {
-        return 'Services'; // Cambia este texto al título deseado
+        return ' '; // Cambia este texto al título deseado
 
     }
 
     public function getBreadcrumb(): string
     {
-        return 'Services'; // Cambia este texto al breadcrumb deseado
+        return 'Listado'; // Cambia este texto al breadcrumb deseado
     }
 }
