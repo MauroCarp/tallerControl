@@ -127,11 +127,11 @@ class CombustiblesLubricantesResource extends Resource
                         if (!empty($filters['fecha']->getState()[1])) {
                             $query->whereDate('fecha', '<=', $filters['fecha']->getState()[1]);
                         }
-                        if (!empty($filters['rodadoHerramienta_id']->getState()[0])) {
-                            $query->where('rodadoHerramienta_id', $filters['rodadoHerramienta_id']->getState()[0]);
+                        if (!empty($filters['rodadoHerramienta_id']->getState()['value'])) {
+                            $query->where('rodadoHerramienta_id', $filters['rodadoHerramienta_id']->getState()['value']);
                         }
-                        if (!empty($filters['tipo']->getState()[0])) {
-                            $query->where('tipo', $filters['tipo']->getState()[0]);
+                        if (!empty($filters['tipo']->getState()['value'])) {
+                            $query->where('tipo', $filters['tipo']->getState()['value']);
                         }
 
                         $query->orderBy('fecha', 'desc');

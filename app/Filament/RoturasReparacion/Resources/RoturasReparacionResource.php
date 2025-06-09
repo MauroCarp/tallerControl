@@ -225,17 +225,20 @@ class RoturasReparacionResource extends Resource
                         if (!empty($filters['fecha']->getState()[1])) {
                             $query->whereDate('fecha', '<=', $filters['fecha']->getState()[1]);
                         }
-                        if (!empty($filters['rodadoHerramienta_id']->getState()[0])) {
-                            $query->where('rodadoHerramienta_id', $filters['rodadoHerramienta_id']->getState()[0]);
+
+                        if (!empty($filters['rodadoHerramienta_id']->getState()['value'])) {
+                            $query->where('rodadoHerramienta_id', $filters['rodadoHerramienta_id']->getState()['value']);
                         }
-                        if (!empty($filters['encargado']->getState()[0])) {
-                            $query->where('encargado', 'like', '%' . $filters['encargado']->getState()[0] . '%');
+
+                        if (!empty($filters['encargado']->getState()['value'])) {
+                            $query->where('encargado', 'like', '%' . $filters['encargado']->getState()['value'] . '%');
                         }
-                        if (!empty($filters['operario']->getState()[0])) {
-                            $query->where('operario', 'like', '%' . $filters['operario']->getState()[0] . '%');
+
+                        if (!empty($filters['operario']->getState()['value'])) {
+                            $query->where('operario', 'like', '%' . $filters['operario']->getState()['value'] . '%');
                         }
-                        if (!empty($filters['tipo']->getState()[0])) {
-                            $query->where('tipo', $filters['tipo']->getState()[0]);
+                        if (!empty($filters['tipo']->getState()['value'])) {
+                            $query->where('tipo', $filters['tipo']->getState()['value']);
                         }
 
                         $query->orderBy('fecha', 'desc');
