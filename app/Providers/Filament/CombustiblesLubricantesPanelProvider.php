@@ -11,8 +11,9 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
-use App\Filament\Widgets\ServiceList;
-use App\Filament\Widgets\CronogramaService;
+use App\Filament\Widgets\NaftaList;
+use App\Filament\Widgets\GasoilList;
+use App\Filament\Widgets\LubricantesList;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,6 +33,7 @@ class CombustiblesLubricantesPanelProvider extends PanelProvider
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
             ->brandName('Control de Taller')
+            ->maxContentWidth('full')
             ->colors([
                 'primary' => Color::Indigo,
             ])
@@ -41,8 +43,9 @@ class CombustiblesLubricantesPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->widgets([
-                CronogramaService::class,
-                ServiceList::class,
+                NaftaList::class,
+                GasoilList::class,
+                LubricantesList::class,
             ])
             ->resources([
                 \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,

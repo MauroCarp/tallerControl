@@ -107,12 +107,10 @@ class ServicesResource extends Resource
                     }),
                 Forms\Components\TextInput::make('horasMotor')
                     ->label('Horas Motor')
-                    ->numeric()
-                    ->required(),
+                    ->numeric(),
                 Forms\Components\TextInput::make('km')
                     ->label('Kilómetros')
-                    ->numeric()
-                    ->required(),
+                    ->numeric(),
                 Forms\Components\CheckboxList::make('tareas')
                     ->label('Tareas')
                     ->options([

@@ -198,7 +198,7 @@ class RoturasReparacionResource extends Resource
                     ->label('Tipo de Trabajo')
                     ->options([
                         'Propio' => 'Propio',
-                        'Tercerizado' => 'Tercerizado',
+                        'Tercierizado' => 'Tercierizado',
                     ]),
             ])
             ->actions([
