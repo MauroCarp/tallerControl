@@ -20,19 +20,36 @@
             <td colspan="8" style="background-color:#000;"></td>
         </tr>
         <thead style="font-size:.9em;font-weight:bold;padding:0 5px;">
-            <th width="80px">Fecha</th>
-            <th width="80px">Tipo</th>
+            <th width="70px">Fecha</th>
+            <th width="70px">Tipo</th>
             <th width="100px">Ingreso Litros</th>
-            <th width="170px">Origen</th>
+            <th width="150px">Origen</th>
             <th width="100px">Egreso Litros</th>
-            <th width="170px">Destino</th>
+            <th width="150px">Destino</th>
+            <th width="80px">STOCK</th>
 
         </thead>
         <tbody>
             
-     
-        @foreach ($records as $record)+
-        @php $rowColor = $loop->odd ? '#f2f2f2' : '#ffffff'; @endphp
+        @php 
+        $stock = 0;
+        @endphp
+
+        @foreach ($records as $record)
+
+        @php 
+        
+        $stock += $record->ingresoLitros;
+
+        if($stock == 0){ 
+            $stock = $record->egresoLitros;
+        }else{ 
+            $stock -= $record->egresoLitros;
+        }
+
+        $rowColor = $loop->odd ? '#f2f2f2' : '#ffffff'; 
+        
+        @endphp
         <tr style="font-size:.8em; background-color: {{ $rowColor }};padding:0 5px;text-align:center">
             @php
                 $fecha = explode('-', $record->fecha);
@@ -43,7 +60,8 @@
             <td>{{ $record->ingresoLitros . ' Lts' }}</td>
             <td>{{ $record->origen }}</td>
             <td>{{ $record->egresoLitros . ' Lts'}}</td>
-            <td>{{ \App\Models\RodadosHerramientas::find($record->rodadoHerramienta_id)?->nombre }}</td>
+            <td>{{ \App\Models\RodadosHerramientas::find($record->destino)?->nombre }}</td>
+            <td>{{ $stock . ' Lts'}}</td>
         </tr>
         @endforeach 
         </tbody>
