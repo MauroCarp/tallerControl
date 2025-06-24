@@ -94,7 +94,7 @@ class CombustiblesLubricantesResource extends Resource
                             ->when($data['fecha_hasta'], fn ($q) => $q->whereDate('fecha', '<=', $data['fecha_hasta']));
                     }),
 
-                Tables\Filters\SelectFilter::make('rodadoHerramienta_id')
+                Tables\Filters\SelectFilter::make('destino')
                     ->label('Rodado/Herramienta')
                     ->options(\App\Models\RodadosHerramientas::all()->pluck('nombre', 'id')->toArray()),
                 Tables\Filters\SelectFilter::make('tipo')
@@ -127,8 +127,8 @@ class CombustiblesLubricantesResource extends Resource
                         if (!empty($filters['fecha']->getState()[1])) {
                             $query->whereDate('fecha', '<=', $filters['fecha']->getState()[1]);
                         }
-                        if (!empty($filters['rodadoHerramienta_id']->getState()['value'])) {
-                            $query->where('rodadoHerramienta_id', $filters['rodadoHerramienta_id']->getState()['value']);
+                        if (!empty($filters['destino']->getState()['value'])) {
+                            $query->where('destino', $filters['destino']->getState()['value']);
                         }
                         if (!empty($filters['tipo']->getState()['value'])) {
                             $query->where('tipo', $filters['tipo']->getState()['value']);

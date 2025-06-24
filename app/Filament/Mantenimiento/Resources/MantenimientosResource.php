@@ -109,9 +109,11 @@ class MantenimientosResource extends Resource
                     }),
                 Forms\Components\TextInput::make('horasMotor')
                     ->label('Horas Motor')
+                    ->default(0)
                     ->numeric(),
                 Forms\Components\TextInput::make('km')
                     ->label('Kilómetros')
+                    ->default(0)
                     ->numeric(),
                 Forms\Components\CheckboxList::make('tareas')
                     ->label('Tareas')
