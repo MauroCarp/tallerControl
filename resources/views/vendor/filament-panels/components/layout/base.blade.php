@@ -26,7 +26,7 @@
             {{ filled($title = strip_tags($livewire->getTitle())) ? "{$title} - " : null }}
             {{ filament()->getBrandName() }}
         </title>
-
+        @laravelPWA
         {{ \Filament\Support\Facades\FilamentView::renderHook('panels::styles.before') }}
 
         <style>
