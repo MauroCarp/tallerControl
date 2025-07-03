@@ -22,7 +22,7 @@
             <x-filament::button tag="a" 
             href="roturasReparacion" 
             id="btnRoturasReparaciones"
-            class="w-full" style="font-size:2em;padding: 1em 1em;">
+            class="w-full" style="font-size:2em;padding: 1em 1em;line-height: 1.2em;text-align:center">
             ROTURAS / REPARACIONES
             </x-filament::button>
 

@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Indigo,
             ])
-            ->sidebarWidth('13rem')
+            ->sidebarWidth('5rem')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->resources([
                 \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,
