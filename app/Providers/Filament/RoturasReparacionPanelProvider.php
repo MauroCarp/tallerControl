@@ -32,6 +32,8 @@ class RoturasReparacionPanelProvider extends PanelProvider
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
             ->maxContentWidth('full')
+            ->sidebarCollapsibleOnDesktop()  
+            ->sidebarWidth('14rem')
             ->colors([
                 'primary' => Color::Indigo,
             ])

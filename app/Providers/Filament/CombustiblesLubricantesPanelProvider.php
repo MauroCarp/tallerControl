@@ -34,6 +34,8 @@ class CombustiblesLubricantesPanelProvider extends PanelProvider
             ->favicon(asset('images/favicon.png'))
             ->brandName('Control de Taller')
             ->maxContentWidth('full')
+            ->sidebarCollapsibleOnDesktop() 
+            ->sidebarWidth('14rem')
             ->colors([
                 'primary' => Color::Indigo,
             ])

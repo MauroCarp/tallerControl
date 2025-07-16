@@ -37,6 +37,9 @@ class MantenimientoPanelProvider extends PanelProvider
             ->brandName('Control de Taller')
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
+            ->sidebarCollapsibleOnDesktop()    
+            ->sidebarWidth('14rem')
+            ->maxContentWidth('full')   
             ->discoverResources(in: app_path('Filament/Mantenimiento/Resources'), for: 'App\\Filament\\Mantenimiento\\Resources')
             ->discoverPages(in: app_path('Filament/Mantenimiento/Pages'), for: 'App\\Filament\\Mantenimiento\\Pages')
             ->pages([

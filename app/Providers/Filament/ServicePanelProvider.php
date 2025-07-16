@@ -32,6 +32,9 @@ class ServicePanelProvider extends PanelProvider
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
             ->brandName('Control de Taller')
+            ->sidebarCollapsibleOnDesktop()            
+            ->maxContentWidth('full')
+            ->sidebarWidth('14rem')
             ->colors([
                 'primary' => Color::Indigo,
             ])
