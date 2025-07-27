@@ -33,7 +33,36 @@ class MantenimientoGeneralResource extends Resource
                         ->schema([
                             Forms\Components\DatePicker::make('fechaSolicitud')->required(),
                             Forms\Components\Textarea::make('tarea')->required(),
-                            Forms\Components\TextInput::make('solicitado')->label('Solicitado por')->required(),
+                            Forms\Components\Select::make('prioridad')
+                                ->label('Prioridad')
+                                ->required()
+                                ->options([
+                                    'BAJA' => 'BAJA',
+                                    'NORMAL' => 'NORMAL',
+                                    'ALTA' => 'ALTA',
+                                    'MUY ALTA' => 'MUY ALTA',
+                                ]),
+                            Forms\Components\TextInput::make('solicitado')
+                                ->label('Sector')
+                                ->readOnly()
+                                ->default(function () {
+                                    $userEmail = auth()->user()?->email;
+                                    switch ($userEmail) {
+                                        case 'ruben@barloventosrl.website':
+                                            return 'Gerencial';
+                                        case 'mauro@mauro.com':
+                                            return 'Gerencial';
+                                        case 'ornela@barloventosrl.website':
+                                            return 'Produccion';
+                                        case 'mariano@barloventosrl.website':
+                                            return 'Administracion';
+                                        case 'carlos@barloventosrl.website':
+                                            return 'Mantenimiento';
+                                        // Agrega más casos según sea necesario
+                                        default:
+                                            return '';
+                                    }
+                                }),
                         ]),
                     Forms\Components\Wizard\Step::make('Realización')
                         ->schema([

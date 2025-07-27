@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.5",
         "silviolleite/laravelpwa": "^2.0",
-        "spatie/laravel-medialibrary": "^11.6"
+        "spatie/laravel-medialibrary": "^11.6",
+        "spatie/laravel-permission": "^6.21"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
