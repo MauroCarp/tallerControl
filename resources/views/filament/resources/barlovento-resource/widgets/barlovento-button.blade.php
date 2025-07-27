@@ -32,6 +32,13 @@
             class="w-full" style="font-size:2em;padding: 1em 1em;line-height: 1.2em;text-align:center">
             COMBUSTIBLES / LUBRICANTES
             </x-filament::button>
+       
+            <x-filament::button tag="a" 
+            href="mantenimientoGeneral" 
+            id="btnmantenimientoGeneral"
+            class="w-full" style="font-size:2em;padding: 1em 1em;line-height: 1.2em;text-align:center">
+            MANTENIMIENTO GENERAL
+            </x-filament::button>
             
         </div>
     </div>

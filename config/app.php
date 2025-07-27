@@ -198,6 +198,7 @@ return [
         App\Providers\Filament\ServicePanelProvider::class,
         App\Providers\Filament\RoturasReparacionPanelProvider::class,
         App\Providers\Filament\CombustiblesLubricantesPanelProvider::class,
+        App\Providers\Filament\MantenimientoGeneralPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
 
     ],
