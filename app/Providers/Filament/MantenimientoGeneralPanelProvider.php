@@ -13,7 +13,7 @@ use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
 use App\Filament\Widgets\MantenimientoGeneralPedidoList;
 use App\Filament\Widgets\MantenimientoGeneralRealizadoList;
-
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -59,6 +59,9 @@ class MantenimientoGeneralPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,
