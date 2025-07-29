@@ -138,7 +138,7 @@ class ServicesResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(static::getModel()::query()->where('isMantenimiento', '0'))
+            ->query(static::getModel()::query()->where('isMantenimiento', '0')->orderBy('fecha', 'desc'))
             ->columns([
                 Tables\Columns\TextColumn::make('fecha')
                     ->label('Fecha')

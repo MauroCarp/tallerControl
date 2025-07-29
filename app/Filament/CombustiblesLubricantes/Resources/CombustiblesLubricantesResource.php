@@ -82,6 +82,7 @@ class CombustiblesLubricantesResource extends Resource
                     ->searchable()  
                     ->label('Destino'),
             ])
+            ->defaultSort('fecha', 'desc')
             ->filters([
                 Tables\Filters\Filter::make('fecha')
                     ->form([

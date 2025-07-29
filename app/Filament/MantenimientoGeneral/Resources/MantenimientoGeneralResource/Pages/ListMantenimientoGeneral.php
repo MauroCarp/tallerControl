@@ -16,7 +16,7 @@ class ListMantenimientoGeneral extends ListRecords
         return [
             Actions\CreateAction::make()
                 ->label('Cargar Mantenimiento') // Cambia este texto al deseado
-                ->visible(fn () => auth()->user()->hasRole('admin')), // Reemplaza 'nombre_del_grupo' por el nombre real del grupo
+                // ->visible(fn () => auth()->user()->hasRole('admin')), // Reemplaza 'nombre_del_grupo' por el nombre real del grupo
         ];
     }
 

@@ -143,7 +143,7 @@ class MantenimientosResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(static::getModel()::query()->where('isMantenimiento', '1'))
+            ->query(static::getModel()::query()->where('isMantenimiento', '1')->orderBy('fecha', 'desc'))
             ->columns([
                 Tables\Columns\TextColumn::make('fecha')
                     ->label('Fecha')
@@ -213,9 +213,11 @@ class MantenimientosResource extends Resource
                 TextEntry::make('turno')
                     ->label('Turno'),
 
-                TextEntry::make('rodadoHerramienta.nombre')
-                    ->label('Rodado/Herramienta'),
-
+                TextEntry::make('rodadoHerramienta_id')
+                    ->label('Rodado/Herramienta')
+                    ->formatStateUsing(function ($state) {
+                        return \App\Models\RodadosHerramientas::find($state)?->nombre ?? '';
+                    }),
                 TextEntry::make('horasMotor')
                     ->label('Horas Motor'),
                 TextEntry::make('km')

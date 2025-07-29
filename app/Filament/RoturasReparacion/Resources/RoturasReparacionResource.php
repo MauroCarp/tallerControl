@@ -160,6 +160,7 @@ class RoturasReparacionResource extends Resource
                     ->searchable()
                     ->sortable(),
             ])
+            ->defaultSort('fecha', 'desc')
             ->filters([
                 Tables\Filters\Filter::make('fecha')
                     ->form([
