@@ -83,7 +83,7 @@ class MantenimientoGeneralResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('fechaSolicitud')->label('Fecha Solicitud')->date(),
+                Tables\Columns\TextColumn::make('fechaSolicitud')->label('Fecha Solicitud')->date('d-m-Y'),
                 Tables\Columns\TextColumn::make('tarea')->label('Tarea')->limit(50),
                 Tables\Columns\TextColumn::make('solicitado')->label('Solicitado por'),
                 Tables\Columns\IconColumn::make('reparado')

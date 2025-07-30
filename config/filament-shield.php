@@ -88,5 +88,9 @@ return [
     'register_role_policy' => [
         'enabled' => true,
     ],
+    'panel_guard_mapping' => [
+        'admin' => 'web',
+        'mantenimientoGeneral' => 'web', // o el ID de tu otro panel
+    ],
 
 ];

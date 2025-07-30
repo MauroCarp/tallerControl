@@ -53,4 +53,17 @@ class User extends Authenticatable implements FilamentUser
     {
         return true;
     }   
+
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        // Si querés permitir a todos los usuarios acceder a todos los panels:
+        return true;
+
+        // O si querés controlar por roles:
+        // return match ($panel->getId()) {
+        //     'admin' => $this->hasRole(['admin', 'super_admin']),
+        //     'mantenimientoGeneral' => $this->hasRole(['mantenimiento', 'super_admin']),
+        //     default => false,
+        // };
+    }
 }

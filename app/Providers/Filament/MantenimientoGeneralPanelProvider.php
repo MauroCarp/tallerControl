@@ -8,6 +8,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Plugins\AuthPlugin;
 use Filament\Support\Colors\Color;
 use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
@@ -21,6 +22,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\App;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
 class MantenimientoGeneralPanelProvider extends PanelProvider
 {
@@ -32,6 +34,7 @@ class MantenimientoGeneralPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Indigo,
             ])
+
             ->brandName('Control de Taller')
             ->brandLogo(asset('images/barlovento-logo.png'))
             ->favicon(asset('images/favicon.png'))
@@ -60,7 +63,10 @@ class MantenimientoGeneralPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->plugins([
-                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make(),
+                AuthPlugin::make()
+                    ->login()
+                    ->logoutRedirectUrl('/admin/login') // o el que corresponda
             ])
             ->authMiddleware([
                 Authenticate::class,
