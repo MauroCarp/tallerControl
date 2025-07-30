@@ -9,7 +9,6 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Plugins\AuthPlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -67,9 +66,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
-                AuthPlugin::make()
-                    ->login()
-                    ->logoutRedirectUrl('/admin/login') // o el que corresponda
             ])
             ->authMiddleware([
                 Authenticate::class,

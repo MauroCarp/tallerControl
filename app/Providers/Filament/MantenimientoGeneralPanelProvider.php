@@ -8,7 +8,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Plugins\AuthPlugin;
 use Filament\Support\Colors\Color;
 use Filament\View\LegacyComponents\Widget;
 use Filament\Widgets;
@@ -64,9 +63,6 @@ class MantenimientoGeneralPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
-                AuthPlugin::make()
-                    ->login()
-                    ->logoutRedirectUrl('/admin/login') // o el que corresponda
             ])
             ->authMiddleware([
                 Authenticate::class,
