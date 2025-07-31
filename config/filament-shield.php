@@ -92,5 +92,10 @@ return [
         'admin' => 'web',
         'mantenimientoGeneral' => 'web', // o el ID de tu otro panel
     ],
+    'auth_guard' => 'web',
+    'models' => [
+        'Role' => \Spatie\Permission\Models\Role::class,
+        'Permission' => \Spatie\Permission\Models\Permission::class,
+    ],
 
 ];
