@@ -263,4 +263,13 @@ class ServicesResource extends Resource
             'edit' => Pages\EditServices::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+
+        $panelId = filament()->getCurrentPanel()->getId();
+
+        // Solo mostrar en el panel 'combustibles' (ajusta el ID según tu configuración)
+        return $panelId === 'service';
+    }
 }

@@ -44,7 +44,12 @@ class AdminPanelProvider extends PanelProvider
             // ->sidebarFullyCollapsibleOnDesktop()           
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->resources([
+                \App\Filament\Mantenimiento\Resources\MantenimientosResource::class,
                 \App\Filament\Mantenimiento\Resources\RodadosHerramientasResource::class,
+                \App\Filament\MantenimientoGeneral\Resources\MantenimientoGeneralResource::class,
+                \App\Filament\RoturasReparacion\Resources\RoturasReparacionResource::class,
+                \App\Filament\Service\Resources\ServicesResource::class,
+                \App\Filament\CombustiblesLubricantes\Resources\CombustiblesLubricantesResource::class,
             ])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([

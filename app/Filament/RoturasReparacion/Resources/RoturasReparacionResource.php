@@ -306,4 +306,13 @@ class RoturasReparacionResource extends Resource
             'edit' => Pages\EditRoturasReparacion::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+
+        $panelId = filament()->getCurrentPanel()->getId();
+
+        // Solo mostrar en el panel 'roturasReparacion' (ajusta el ID según tu configuración)
+        return $panelId === 'roturasReparacion';
+    }
 }

@@ -169,4 +169,14 @@ class CombustiblesLubricantesResource extends Resource
             'edit' => Pages\EditCombustiblesLubricantes::route('/{record}/edit'),
         ];
     }
+    
+    public static function shouldRegisterNavigation(): bool
+    {
+
+        $panelId = filament()->getCurrentPanel()->getId();
+
+        // Solo mostrar en el panel 'combustibles' (ajusta el ID según tu configuración)
+        return $panelId === 'combustiblesLubricantes';
+    }
+
 }

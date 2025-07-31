@@ -266,4 +266,13 @@ class MantenimientosResource extends Resource
             'edit' => Pages\EditMantenimientos::route('/{record}/edit'),
         ];
     }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+
+        $panelId = filament()->getCurrentPanel()->getId();
+
+        // Solo mostrar en el panel 'mantenimientos' (ajusta el ID según tu configuración)
+        return $panelId === 'mantenimiento';
+    }
 }
