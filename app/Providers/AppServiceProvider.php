@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Filament\Http\Responses\Auth\Contracts\LogoutResponse;
 use App\Filament\Responses\CustomLogoutResponse;
+use App\Models\MantenimientoGeneral;
+use App\Observers\MantenimientoGeneralObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        MantenimientoGeneral::observe(MantenimientoGeneralObserver::class);
     }
 }

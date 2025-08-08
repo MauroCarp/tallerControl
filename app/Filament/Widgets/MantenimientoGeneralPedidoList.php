@@ -29,7 +29,7 @@ class MantenimientoGeneralPedidoList extends BaseWidget
     {
         return $table
             ->query(
-                MantenimientoGeneral::query()->select(['id','fechaSolicitud','tarea','solicitado'])->where('reparado','0')->orderBy('fechaSolicitud', 'desc')
+                MantenimientoGeneral::query()->select(['id','fechaSolicitud','tarea','solicitado','prioridad','prioridad_orden'])->where('reparado','0')->orderBy('fechaSolicitud', 'desc')
             )
             ->columns([
                 Tables\Columns\TextColumn::make('fechaSolicitud')
@@ -39,6 +39,21 @@ class MantenimientoGeneralPedidoList extends BaseWidget
                     ->label('Tarea'),
                 Tables\Columns\TextColumn::make('solicitado')
                     ->label('Solicitado por'),
+                Tables\Columns\TextColumn::make('prioridad')
+                    ->label('Prioridad Solicitada')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'BAJA' => 'info',
+                        'NORMAL' => 'success',
+                        'ALTA' => 'warning',
+                        'MUY ALTA' => 'danger',
+                        default => 'secondary',
+                    }),
+                Tables\Columns\TextColumn::make('prioridad_orden')
+                    ->label('Prioridad de Orden de Trabajo')
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
             ])->paginated(false);
     }
 }

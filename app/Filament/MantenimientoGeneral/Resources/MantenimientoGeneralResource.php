@@ -66,14 +66,21 @@ class MantenimientoGeneralResource extends Resource
                 ]),
                 Forms\Components\Wizard\Step::make('Realización')
                 ->schema([
-                    Forms\Components\Checkbox::make('reparado')
-                    ->default(0)
-                    ->dehydrateStateUsing(fn ($state) => $state ? 1 : 0),
+                    
+                    Forms\Components\DatePicker::make('fechaRealizar')->label('Fecha a Realizar'),
+                    Forms\Components\TextInput::make('prioridad_orden')
+                        ->label('Orden de Prioridad')
+                        ->numeric()
+                        ->minValue(1)
+                        ->helperText('Las tareas existentes se reorganizarán automáticamente'),
                     Forms\Components\TextInput::make('realizado')->label('Realizado por'),
                     Forms\Components\DatePicker::make('fechaRealizado'),
                     Forms\Components\TextInput::make('horas')->numeric(),
                     Forms\Components\Textarea::make('materiales'),
                     Forms\Components\TextInput::make('costo')->numeric(),
+                    Forms\Components\Checkbox::make('reparado')
+                    ->default(0)
+                    ->dehydrateStateUsing(fn ($state) => $state ? 1 : 0),
                 ])
                 ->hidden(function (string $context) {
                     // Solo mostrar en edición y si el usuario tiene el rol adecuado
@@ -96,13 +103,29 @@ class MantenimientoGeneralResource extends Resource
                 Tables\Columns\TextColumn::make('fechaSolicitud')->label('Fecha Solicitud')->date('d-m-Y'),
                 Tables\Columns\TextColumn::make('tarea')->label('Tarea')->limit(50),
                 Tables\Columns\TextColumn::make('solicitado')->label('Solicitado por'),
+                Tables\Columns\TextColumn::make('prioridad')
+                    ->label('Prioridad Solicitada')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'BAJA' => 'info',
+                        'NORMAL' => 'success',
+                        'ALTA' => 'warning',
+                        'MUY ALTA' => 'danger',
+                        default => 'secondary',
+                    }),
                 Tables\Columns\IconColumn::make('reparado')
-                    ->label('Reparado')
+                    ->label('Realizado')
                     ->boolean()
                     ->trueIcon('heroicon-o-check')
                     ->falseIcon('heroicon-o-x-mark')
                     ->trueColor('success')
                     ->falseColor('danger'),
+                Tables\Columns\TextColumn::make('fechaRealizar')->label('Fecha a Realizar')->date('d-m-Y'),
+                Tables\Columns\TextColumn::make('prioridad_orden')
+                    ->label('Orden Prioridad de Trabajo')
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
                 Tables\Columns\TextColumn::make('realizado')->label('Realizado por'),
                 Tables\Columns\TextColumn::make('horas')->label('Horas'),
                 Tables\Columns\TextColumn::make('materiales')->label('Materiales')->limit(50),
