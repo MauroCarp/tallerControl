@@ -63,7 +63,23 @@ class MantenimientoGeneralResource extends Resource
                             return '';
                         }
                     }),
-                ]),
+                ])->hidden(function (string $context, ?MantenimientoGeneral $record) {
+                    if ($context !== 'edit' || !$record) {
+                        return false; // Mostrar en creación
+                    }
+                    
+                    $userEmail = auth()->user()?->email;
+                    $userSector = match($userEmail) {
+                        'ruben@barloventosrl.website', 'mauro@mauro.com' => 'Gerencial',
+                        'ornela@barloventosrl.website' => 'Produccion',
+                        'mariano@barloventosrl.website' => 'Administracion',
+                        'carlos@barloventosrl.website' => 'Mantenimiento',
+                        default => ''
+                    };
+                    
+                    // Ocultar si el usuario no puede editar este registro
+                    return $record->solicitado !== $userSector;
+                }),
                 Forms\Components\Wizard\Step::make('Realización')
                 ->schema([
                     
@@ -126,11 +142,11 @@ class MantenimientoGeneralResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('info'),
-                Tables\Columns\TextColumn::make('realizado')->label('Realizado por'),
-                Tables\Columns\TextColumn::make('horas')->label('Horas'),
-                Tables\Columns\TextColumn::make('materiales')->label('Materiales')->limit(50),
-                Tables\Columns\TextColumn::make('costo')->label('Costo'),
-                Tables\Columns\TextColumn::make('fechaRealizado')->label('Fecha Realizado')->date(),
+                // Tables\Columns\TextColumn::make('realizado')->label('Realizado por'),
+                // Tables\Columns\TextColumn::make('horas')->label('Horas'),
+                // Tables\Columns\TextColumn::make('materiales')->label('Materiales')->limit(50),
+                // Tables\Columns\TextColumn::make('costo')->label('Costo'),
+                // Tables\Columns\TextColumn::make('fechaRealizado')->label('Fecha Realizado')->date(),
             ])
             ->filters([
                 //

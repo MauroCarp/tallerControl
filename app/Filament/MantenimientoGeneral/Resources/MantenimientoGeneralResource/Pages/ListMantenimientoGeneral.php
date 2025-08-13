@@ -3,6 +3,7 @@
 namespace App\Filament\MantenimientoGeneral\Resources\MantenimientoGeneralResource\Pages;
 
 use App\Filament\MantenimientoGeneral\Resources\MantenimientoGeneralResource;
+
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -29,6 +30,13 @@ class ListMantenimientoGeneral extends ListRecords
     public function getBreadcrumb(): string
     {
         return 'Listado'; // Cambia este texto al breadcrumb deseado
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\MantenimientoGeneralRealizado::class,
+        ];
     }
 
 }
