@@ -18,7 +18,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MantenimientoGeneralResource extends Resource
 {
-    protected static ?string $model = MantenimientoGeneral::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Mantenimiento General'; // Nombre del enlace
@@ -118,51 +117,52 @@ class MantenimientoGeneralResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->where('reparado', 0))
             ->columns([
-                Tables\Columns\TextColumn::make('fechaSolicitud')->label('Fecha Solicitud')->date('d-m-Y'),
-                Tables\Columns\TextColumn::make('tarea')->label('Tarea')->limit(50),
-                Tables\Columns\TextColumn::make('solicitado')->label('Solicitado por'),
-                Tables\Columns\TextColumn::make('prioridad')
-                    ->label('Prioridad Solicitada')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'BAJA' => 'info',
-                        'NORMAL' => 'success',
-                        'ALTA' => 'warning',
-                        'MUY ALTA' => 'danger',
-                        default => 'secondary',
-                    }),
-                Tables\Columns\IconColumn::make('reparado')
-                    ->label('Realizado')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check')
-                    ->falseIcon('heroicon-o-x-mark')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
-                Tables\Columns\TextColumn::make('fechaRealizar')->label('Fecha a Realizar')->date('d-m-Y'),
-                Tables\Columns\TextColumn::make('prioridad_orden')
-                    ->label('Orden Prioridad de Trabajo')
-                    ->sortable()
-                    ->badge()
-                    ->color('info'),
-                // Tables\Columns\TextColumn::make('realizado')->label('Realizado por'),
-                // Tables\Columns\TextColumn::make('horas')->label('Horas'),
-                // Tables\Columns\TextColumn::make('materiales')->label('Materiales')->limit(50),
-                // Tables\Columns\TextColumn::make('costo')->label('Costo'),
-                // Tables\Columns\TextColumn::make('fechaRealizado')->label('Fecha Realizado')->date(),
+            Tables\Columns\TextColumn::make('fechaSolicitud')->label('Fecha Solicitud')->date('d-m-Y'),
+            Tables\Columns\TextColumn::make('tarea')->label('Tarea')->limit(50),
+            Tables\Columns\TextColumn::make('solicitado')->label('Solicitado por'),
+            Tables\Columns\TextColumn::make('prioridad')
+                ->label('Prioridad Solicitada')
+                ->badge()
+                ->color(fn ($state) => match ($state) {
+                'BAJA' => 'info',
+                'NORMAL' => 'success',
+                'ALTA' => 'warning',
+                'MUY ALTA' => 'danger',
+                default => 'secondary',
+                }),
+            Tables\Columns\IconColumn::make('reparado')
+                ->label('Realizado')
+                ->boolean()
+                ->trueIcon('heroicon-o-check')
+                ->falseIcon('heroicon-o-x-mark')
+                ->trueColor('success')
+                ->falseColor('danger'),
+            Tables\Columns\TextColumn::make('fechaRealizar')->label('Fecha a Realizar')->date('d-m-Y'),
+            Tables\Columns\TextColumn::make('prioridad_orden')
+                ->label('Orden Prioridad de Trabajo')
+                ->sortable()
+                ->badge()
+                ->color('info'),
+            // Tables\Columns\TextColumn::make('realizado')->label('Realizado por'),
+            // Tables\Columns\TextColumn::make('horas')->label('Horas'),
+            // Tables\Columns\TextColumn::make('materiales')->label('Materiales')->limit(50),
+            // Tables\Columns\TextColumn::make('costo')->label('Costo'),
+            // Tables\Columns\TextColumn::make('fechaRealizado')->label('Fecha Realizado')->date(),
             ])
             ->filters([
-                //
+            //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+            Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
             ]);
-    }
+        }
 
     public static function getRelations(): array
     {
