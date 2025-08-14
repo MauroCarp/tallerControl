@@ -69,16 +69,19 @@ class MantenimientoGeneralResource extends Resource
                     }
                     
                     $userEmail = auth()->user()?->email;
+
+                    // Mostrar el paso "Solicitud" a todos los usuarios,
+                    // pero los usuarios de mantenimiento solo lo ven si el campo solicitado es 'Mantenimiento'
                     $userSector = match($userEmail) {
-                        'ruben@barloventosrl.website', 'mauro@mauro.com' => 'Gerencial',
-                        'ornela@barloventosrl.website' => 'Produccion',
-                        'mariano@barloventosrl.website' => 'Administracion',
                         'carlos@barloventosrl.website' => 'Mantenimiento',
                         default => ''
                     };
-                    
-                    // Ocultar si el usuario no puede editar este registro
-                    return $record->solicitado !== $userSector;
+
+                    if ($userSector === 'Mantenimiento') {
+                        return $record->solicitado !== 'Mantenimiento';
+                    }
+
+                    return false; // Otros usuarios siempre pueden ver el paso
                 }),
                 Forms\Components\Wizard\Step::make('Realización')
                 ->schema([
