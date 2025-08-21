@@ -13,40 +13,77 @@ var filesToCache = [
     '/images/icons/icon-512x512.png',
 ];
 
-// Cache on install
+// Instalar Service Worker
 self.addEventListener("install", event => {
-    this.skipWaiting();
-    event.waitUntil(
-        caches.open(staticCacheName)
-            .then(cache => {
-                return cache.addAll(filesToCache);
-            })
-    )
+    console.log('Service Worker instalado');
+    self.skipWaiting();
 });
 
-// Clear cache on activate
+// Activar Service Worker
 self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames
-                    .filter(cacheName => (cacheName.startsWith("pwa-")))
-                    .filter(cacheName => (cacheName !== staticCacheName))
-                    .map(cacheName => caches.delete(cacheName))
-            );
-        })
-    );
+    console.log('Service Worker activado');
+    event.waitUntil(self.clients.claim());
 });
 
-// Serve from Cache
+// Manejar requests de fetch de forma simple
 self.addEventListener("fetch", event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(response => {
-                return response || fetch(event.request);
+    // Solo interceptar requests si es necesario
+    event.respondWith(fetch(event.request));
+});
+
+// Push Notifications
+self.addEventListener('push', event => {
+    if (event.data) {
+        const data = event.data.json();
+        const options = {
+            body: data.body,
+            icon: data.icon || '/images/icons/icon-192x192.png',
+            badge: data.badge || '/images/icons/icon-72x72.png',
+            tag: data.tag || 'default',
+            data: data.data || {},
+            actions: [
+                {
+                    action: 'open',
+                    title: 'Abrir'
+                },
+                {
+                    action: 'close',
+                    title: 'Cerrar'
+                }
+            ]
+        };
+
+        event.waitUntil(
+            self.registration.showNotification(data.title, options)
+        );
+    }
+});
+
+// Notification click handler
+self.addEventListener('notificationclick', event => {
+    event.notification.close();
+
+    if (event.action === 'open' || !event.action) {
+        const urlToOpen = event.notification.data.url || '/';
+        
+        event.waitUntil(
+            clients.matchAll({
+                type: 'window',
+                includeUncontrolled: true
+            }).then(clientList => {
+                // Si ya hay una ventana abierta, enfocarla
+                for (let i = 0; i < clientList.length; i++) {
+                    const client = clientList[i];
+                    if (client.url === urlToOpen && 'focus' in client) {
+                        return client.focus();
+                    }
+                }
+                
+                // Si no hay ventana abierta, abrir una nueva
+                if (clients.openWindow) {
+                    return clients.openWindow(urlToOpen);
+                }
             })
-            .catch(() => {
-                return caches.match('offline');
-            })
-    )
+        );
+    }
 });
