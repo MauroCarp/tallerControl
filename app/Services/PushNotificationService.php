@@ -13,13 +13,36 @@ class PushNotificationService
 
     public function __construct()
     {
-        $this->webPush = new WebPush([
+        $auth = [
             'VAPID' => [
                 'subject' => config('app.vapid_subject'),
                 'publicKey' => config('app.vapid_public_key'),
                 'privateKey' => config('app.vapid_private_key'),
             ],
-        ]);
+        ];
+
+        $defaultOptions = [];
+        $timeout = 30;
+        
+        // Configuración SSL para cURL - se pasa como clientOptions al constructor
+        $clientOptions = [];
+        $verifySSL = env('PUSH_VERIFY_SSL', true);
+        Log::info('SSL verification setting', ['verify_ssl' => $verifySSL]);
+        
+        if (!$verifySSL) {
+            $clientOptions = [
+                'verify' => false,
+                'timeout' => 30,
+                'connect_timeout' => 10,
+                'curl' => [
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                ]
+            ];
+            Log::info('SSL verification disabled for push notifications with CURL options');
+        }
+
+        $this->webPush = new WebPush($auth, $defaultOptions, $timeout, $clientOptions);
     }
 
     /**
@@ -86,13 +109,37 @@ class PushNotificationService
     public function sendToUser(int $userId, array $payload): int
     {
         $subscriptions = PushSubscription::where('user_id', $userId)->get();
+        Log::info("sendToUser: Buscando suscripciones para usuario", [
+            'user_id' => $userId,
+            'subscriptions_found' => $subscriptions->count()
+        ]);
+        
         $successCount = 0;
 
         foreach ($subscriptions as $subscription) {
+            Log::info("sendToUser: Intentando enviar a suscripción", [
+                'subscription_id' => $subscription->id,
+                'user_id' => $userId,
+                'endpoint' => substr($subscription->endpoint, 0, 50) . '...'
+            ]);
+            
             if ($this->sendToSubscription($subscription, $payload)) {
                 $successCount++;
+                Log::info("sendToUser: Envío exitoso a suscripción", [
+                    'subscription_id' => $subscription->id
+                ]);
+            } else {
+                Log::warning("sendToUser: Envío fallido a suscripción", [
+                    'subscription_id' => $subscription->id
+                ]);
             }
         }
+
+        Log::info("sendToUser: Resultado final", [
+            'user_id' => $userId,
+            'total_subscriptions' => $subscriptions->count(),
+            'successful_sends' => $successCount
+        ]);
 
         return $successCount;
     }

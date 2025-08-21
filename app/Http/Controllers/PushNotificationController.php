@@ -15,6 +15,9 @@ class PushNotificationController extends Controller
     public function __construct(PushNotificationService $pushService)
     {
         $this->pushService = $pushService;
+        
+        // Aplicar middleware de autenticación para las rutas de suscripción
+        $this->middleware('auth')->only(['subscribe']);
     }
 
     /**
@@ -43,17 +46,23 @@ class PushNotificationController extends Controller
         }
 
         try {
+            // Asegurar que tenemos un usuario autenticado
+            if (!Auth::check()) {
+                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            }
+            
             $subscription = $this->pushService->createSubscription(
-                Auth::id() ?? 1, // Si no hay usuario autenticado, usar ID 1
+                Auth::id(),
                 $request->all()
             );
 
             return response()->json([
                 'message' => 'Suscripción creada exitosamente',
-                'subscription_id' => $subscription->id
+                'subscription_id' => $subscription->id,
+                'user_id' => Auth::id()
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al crear la suscripción'], 500);
+            return response()->json(['error' => 'Error al crear la suscripción: ' . $e->getMessage()], 500);
         }
     }
 
@@ -62,6 +71,15 @@ class PushNotificationController extends Controller
      */
     public function sendTest(Request $request): JsonResponse
     {
+        // Log de entrada para debugging
+        \Log::info("sendTest: Datos recibidos", [
+            'title' => $request->title,
+            'message' => $request->message,
+            'user_id' => $request->user_id,
+            'user_id_type' => gettype($request->user_id),
+            'all_request_data' => $request->all()
+        ]);
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'message' => 'required|string|max:500',
@@ -69,6 +87,7 @@ class PushNotificationController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Log::warning("sendTest: Validación fallida", ['errors' => $validator->errors()]);
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
@@ -91,12 +110,24 @@ class PushNotificationController extends Controller
             
             if ($request->user_id) {
                 // Enviar a un usuario específico
+                \Log::info("Enviando notificación a usuario específico", [
+                    'user_id' => $request->user_id,
+                    'title' => $request->title,
+                    'suscripciones_usuario' => \App\Models\PushSubscription::where('user_id', $request->user_id)->count()
+                ]);
+                
                 $successCount = $this->pushService->sendToUser($request->user_id, $payload);
-                \Log::info("Enviando a usuario {$request->user_id}, éxito: {$successCount}");
+                \Log::info("Resultado envío a usuario específico", [
+                    'user_id' => $request->user_id,
+                    'success_count' => $successCount
+                ]);
             } else {
                 // Enviar a todos los usuarios
+                \Log::info("Enviando notificación a todos los usuarios");
                 $successCount = $this->pushService->sendToAll($payload);
-                \Log::info("Enviando a todos, éxito: {$successCount}");
+                \Log::info("Resultado envío a todos", [
+                    'success_count' => $successCount
+                ]);
             }
 
             return response()->json([

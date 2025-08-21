@@ -346,7 +346,10 @@
             
             const title = document.getElementById('title').value;
             const message = document.getElementById('message').value;
-            const userId = document.getElementById('userId').value || null;
+            const userIdValue = document.getElementById('userId').value.trim();
+            const userId = userIdValue === '' ? null : parseInt(userIdValue);
+            
+            console.log('Enviando notificación con:', { title, message, userId, userIdValue });
             
             try {
                 const statusDiv = document.getElementById('status');
