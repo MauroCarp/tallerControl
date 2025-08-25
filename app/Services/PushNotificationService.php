@@ -152,19 +152,42 @@ class PushNotificationService
         $subscriptions = PushSubscription::all();
         $successCount = 0;
 
+        Log::info("sendToAll: Enviando a todas las suscripciones", [
+            'total_subscriptions' => $subscriptions->count()
+        ]);
+
         foreach ($subscriptions as $subscription) {
+            Log::info("sendToAll: Intentando enviar a suscripción", [
+                'subscription_id' => $subscription->id,
+                'user_id' => $subscription->user_id,
+                'is_anonymous' => is_null($subscription->user_id),
+                'endpoint' => substr($subscription->endpoint, 0, 50) . '...'
+            ]);
+
             if ($this->sendToSubscription($subscription, $payload)) {
                 $successCount++;
+                Log::info("sendToAll: Envío exitoso", [
+                    'subscription_id' => $subscription->id
+                ]);
+            } else {
+                Log::warning("sendToAll: Envío fallido", [
+                    'subscription_id' => $subscription->id
+                ]);
             }
         }
+
+        Log::info("sendToAll: Resultado final", [
+            'total_subscriptions' => $subscriptions->count(),
+            'successful_sends' => $successCount
+        ]);
 
         return $successCount;
     }
 
     /**
-     * Crear una nueva suscripción
+     * Crear una nueva suscripción push
      */
-    public function createSubscription(int $userId, array $subscriptionData): PushSubscription
+    public function createSubscription(?int $userId, array $subscriptionData): PushSubscription
     {
         $endpointHash = hash('sha256', $subscriptionData['endpoint']);
         

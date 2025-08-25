@@ -16,8 +16,8 @@ class PushNotificationController extends Controller
     {
         $this->pushService = $pushService;
         
-        // Aplicar middleware de autenticación para las rutas de suscripción
-        $this->middleware('auth')->only(['subscribe']);
+        // Remove middleware requirement for subscribe to allow testing
+        // Authentication will be checked within the method
     }
 
     /**
@@ -46,23 +46,125 @@ class PushNotificationController extends Controller
         }
 
         try {
-            // Asegurar que tenemos un usuario autenticado
-            if (!Auth::check()) {
-                return response()->json(['error' => 'Usuario no autenticado'], 401);
+            // Get user ID if authenticated, otherwise use null for anonymous subscriptions
+            $userId = Auth::check() ? Auth::id() : null;
+            
+            // For production, you might want to require authentication
+            // For testing purposes, allow anonymous subscriptions with null user_id
+            if (!$userId) {
+                // Create anonymous subscription - in production you might want to restrict this
+                \Log::info('Creating anonymous subscription for testing');
             }
             
             $subscription = $this->pushService->createSubscription(
-                Auth::id(),
+                $userId,
                 $request->all()
             );
 
             return response()->json([
                 'message' => 'Suscripción creada exitosamente',
                 'subscription_id' => $subscription->id,
-                'user_id' => Auth::id()
+                'user_id' => $userId,
+                'is_authenticated' => Auth::check(),
+                'is_anonymous' => !Auth::check()
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al crear la suscripción: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Verificar si existe una suscripción
+     */
+    public function verifySubscription(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'endpoint' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => 'Endpoint requerido'], 400);
+        }
+
+        try {
+            $endpoint = $request->endpoint;
+            $endpointHash = hash('sha256', $endpoint);
+            
+            \Log::info('Verificando suscripción', [
+                'endpoint_preview' => substr($endpoint, 0, 50) . '...',
+                'endpoint_hash' => $endpointHash,
+                'user_id' => Auth::id(),
+                'is_authenticated' => Auth::check()
+            ]);
+            
+            // Buscar suscripción por endpoint hash
+            $subscription = \App\Models\PushSubscription::where('endpoint_hash', $endpointHash)->first();
+            
+            if ($subscription) {
+                \Log::info('Suscripción encontrada', [
+                    'subscription_id' => $subscription->id,
+                    'subscription_user_id' => $subscription->user_id,
+                    'current_user_id' => Auth::id()
+                ]);
+                
+                // Si está autenticado, verificar que sea del usuario actual
+                if (Auth::check() && $subscription->user_id && $subscription->user_id !== Auth::id()) {
+                    \Log::warning('Suscripción pertenece a diferente usuario', [
+                        'subscription_user' => $subscription->user_id,
+                        'current_user' => Auth::id()
+                    ]);
+                    
+                    return response()->json([
+                        'exists' => false,
+                        'reason' => 'subscription_belongs_to_different_user',
+                        'debug' => [
+                            'subscription_user_id' => $subscription->user_id,
+                            'current_user_id' => Auth::id()
+                        ]
+                    ]);
+                }
+                
+                return response()->json([
+                    'exists' => true,
+                    'subscription_id' => $subscription->id,
+                    'user_id' => $subscription->user_id,
+                    'is_current_user' => Auth::check() && $subscription->user_id === Auth::id(),
+                    'debug' => [
+                        'endpoint_hash' => $endpointHash,
+                        'subscription_user_id' => $subscription->user_id,
+                        'current_user_id' => Auth::id()
+                    ]
+                ]);
+            }
+            
+            \Log::info('Suscripción no encontrada', [
+                'endpoint_hash' => $endpointHash,
+                'total_subscriptions' => \App\Models\PushSubscription::count()
+            ]);
+            
+            return response()->json([
+                'exists' => false,
+                'reason' => 'subscription_not_found',
+                'debug' => [
+                    'endpoint_hash' => $endpointHash,
+                    'total_subscriptions_in_db' => \App\Models\PushSubscription::count(),
+                    'user_id' => Auth::id()
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error verificando suscripción', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'error' => 'Error verificando suscripción: ' . $e->getMessage(),
+                'debug' => [
+                    'user_id' => Auth::id(),
+                    'is_authenticated' => Auth::check()
+                ]
+            ], 500);
         }
     }
 

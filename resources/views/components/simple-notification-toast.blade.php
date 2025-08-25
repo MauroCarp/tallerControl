@@ -15,7 +15,7 @@
                 <span id="simple-btn-text">Activar Notificaciones</span>
                 <span id="simple-btn-loading" style="display: none;">⏳</span>
             </button>
-            <button onclick="closeSimpleToast()" 
+            <button id="simple-later-btn" onclick="closeSimpleToast()" 
                     style="padding: 8px 16px; border-radius: 6px; font-size: 14px; background: transparent; color: white; border: 1px solid rgba(255, 255, 255, 0.3); cursor: pointer;">
                 Más tarde
             </button>
@@ -33,13 +33,18 @@
 <script>
 let simpleToastShown = false;
 
-function showSimpleToast(message) {
+function showSimpleToast(message, type = 'default', reason = '') {
     if (simpleToastShown) return;
     
     const toast = document.getElementById('simple-notification-toast');
     const messageEl = document.getElementById('simple-toast-message');
     
-    if (message) {
+    // Actualizar interfaz según el tipo
+    if (type === 'reactivate') {
+        updateToastForReactivation(reason);
+    } else if (type === 'new') {
+        updateToastForNewUser();
+    } else if (message) {
         messageEl.textContent = message;
     }
     
@@ -56,6 +61,43 @@ function showSimpleToast(message) {
 
 function closeSimpleToast() {
     document.getElementById('simple-notification-toast').style.display = 'none';
+}
+
+function updateToastForReactivation(reason = '') {
+    const messageEl = document.getElementById('simple-toast-message');
+    const btnText = document.getElementById('simple-btn-text');
+    const laterBtn = document.getElementById('simple-later-btn');
+    
+    let message = 'Parece que tus notificaciones se desconectaron. Reconectemos.';
+    
+    // Mensajes más específicos según la razón
+    switch(reason) {
+        case 'subscription_not_found':
+            message = 'Tus notificaciones necesitan ser configuradas nuevamente.';
+            break;
+        case 'subscription_belongs_to_different_user':
+            message = 'Estas notificaciones pertenecen a otro usuario. Configura las tuyas.';
+            break;
+        case 'server_error':
+            message = 'Problema de conexión. Intentemos reconectar las notificaciones.';
+            break;
+        default:
+            message = 'Parece que tus notificaciones se desconectaron. Reconectemos.';
+    }
+    
+    messageEl.textContent = message;
+    btnText.textContent = 'Reconectar';
+    laterBtn.textContent = 'Omitir';
+}
+
+function updateToastForNewUser() {
+    const messageEl = document.getElementById('simple-toast-message');
+    const btnText = document.getElementById('simple-btn-text');
+    const laterBtn = document.getElementById('simple-later-btn');
+    
+    messageEl.textContent = 'Mantente al día con las últimas actualizaciones del taller.';
+    btnText.textContent = 'Activar Notificaciones';
+    laterBtn.textContent = 'Más tarde';
 }
 
 async function enableSimpleNotifications() {
@@ -93,15 +135,40 @@ async function enableSimpleNotifications() {
         // Obtener clave VAPID del servidor
         console.log('🔑 Obteniendo clave VAPID...');
         const vapidResponse = await fetch('/push/vapid-public-key');
+        if (!vapidResponse.ok) {
+            throw new Error(`Error HTTP ${vapidResponse.status} obteniendo clave VAPID`);
+        }
+        
         const vapidData = await vapidResponse.json();
-        const vapidKey = vapidData.public_key;
-        console.log('✅ Clave VAPID obtenida');
+        const vapidKey = vapidData.publicKey; // ✅ Corregido: usar camelCase
+        
+        if (!vapidKey) {
+            throw new Error('No se recibió la clave VAPID del servidor');
+        }
+        
+        console.log('✅ Clave VAPID obtenida:', vapidKey.substring(0, 20) + '...');
+        
+        // Función para convertir VAPID key a Uint8Array (igual que push-notifications.js)
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding)
+                .replace(/-/g, '+')
+                .replace(/_/g, '/');
+
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
         
         // Crear suscripción
         console.log('📝 Creando suscripción push...');
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
-            applicationServerKey: vapidKey
+            applicationServerKey: urlBase64ToUint8Array(vapidKey) // ✅ Convertir a Uint8Array
         });
         console.log('✅ Suscripción creada');
         
@@ -185,25 +252,72 @@ async function checkSimpleNotificationStatus() {
     
     if (permission === 'default') {
         console.log('📢 Mostrando toast - usuario no ha decidido');
-        showSimpleToast('Mantente al día con las últimas actualizaciones del taller.');
+        showSimpleToast('', 'new');
         return;
     }
     
     if (permission === 'granted') {
         try {
+            // Verificar service worker
             const registration = await navigator.serviceWorker.getRegistration();
-            if (registration) {
-                const subscription = await registration.pushManager.getSubscription();
-                if (!subscription) {
-                    console.log('📢 Mostrando toast - tiene permisos pero no suscripción');
-                    showSimpleToast('Completa la configuración de notificaciones.');
-                }
-            } else {
+            if (!registration) {
                 console.log('📢 Mostrando toast - tiene permisos pero no service worker');
-                showSimpleToast('Completa la configuración de notificaciones.');
+                showSimpleToast('', 'new');
+                return;
             }
+            
+            // Verificar suscripción local
+            const subscription = await registration.pushManager.getSubscription();
+            if (!subscription) {
+                console.log('📢 Mostrando toast - tiene permisos pero no suscripción local');
+                showSimpleToast('', 'new');
+                return;
+            }
+            
+            // Verificar si la suscripción existe en el servidor
+            console.log('🔍 Verificando suscripción en el servidor...');
+            console.log('📍 Endpoint a verificar:', subscription.endpoint);
+            try {
+                const response = await fetch('/push/verify-subscription', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({
+                        endpoint: subscription.endpoint
+                    })
+                });
+                
+                console.log('📡 Respuesta del servidor:', response.status);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('📋 Resultado de verificación:', result);
+                    
+                    if (result.exists) {
+                        console.log('✅ Usuario ya está suscrito correctamente - no mostrar toast');
+                        return;
+                    } else {
+                        console.log('⚠️ Suscripción local existe pero no en servidor');
+                        console.log('🔍 Razón:', result.reason);
+                        console.log('📢 Mostrando toast de reconexión');
+                        showSimpleToast('', 'reactivate', result.reason);
+                    }
+                } else {
+                    console.log('❌ Error HTTP verificando servidor:', response.status);
+                    const errorText = await response.text();
+                    console.log('📄 Respuesta de error:', errorText);
+                    showSimpleToast('', 'reactivate', 'server_error');
+                }
+            } catch (serverError) {
+                console.error('❌ Error conectando con servidor:', serverError);
+                showSimpleToast('', 'reactivate', 'server_error');
+            }
+            
         } catch (error) {
             console.error('❌ Error verificando suscripción:', error);
+            showSimpleToast('', 'reactivate', 'verification_error');
         }
     }
 }

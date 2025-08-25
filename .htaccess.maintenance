@@ -1,0 +1,23 @@
+# Archivo .htaccess para modo mantenimiento
+# Para activar el modo mantenimiento, renombra este archivo de .htaccess.maintenance a .htaccess
+
+RewriteEngine On
+
+# Permitir acceso a archivos estáticos necesarios
+RewriteCond %{REQUEST_URI} !^/maintenance\.php$
+RewriteCond %{REQUEST_URI} !^/css/
+RewriteCond %{REQUEST_URI} !^/js/
+RewriteCond %{REQUEST_URI} !^/images/
+RewriteCond %{REQUEST_URI} !^/favicon\.ico$
+
+# Redirigir todo el tráfico a la página de mantenimiento
+RewriteRule ^(.*)$ /maintenance.php [R=503,L]
+
+# Enviar código de estado HTTP 503 (Servicio no disponible)
+ErrorDocument 503 /maintenance.php
+
+# Headers para indicar que es mantenimiento temporal
+<IfModule mod_headers.c>
+    Header always set Retry-After "3600"
+    Header always set Cache-Control "no-cache, no-store, must-revalidate"
+</IfModule>

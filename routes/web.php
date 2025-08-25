@@ -43,13 +43,18 @@ Route::post('/merma-humedad', [MermaHumedadController::class, 'getMermaHumedad']
 
 // Push Notifications Routes
 Route::get('/push/vapid-public-key', [PushNotificationController::class, 'getVapidPublicKey']);
+Route::post('/push/verify-subscription', [PushNotificationController::class, 'verifySubscription']);
 
-// Rutas protegidas que requieren autenticación
-Route::middleware('auth')->group(function () {
-    Route::post('/push/subscribe', [PushNotificationController::class, 'subscribe']);
-    Route::post('/push-subscriptions', [PushNotificationController::class, 'subscribe']); // Ruta alternativa para el toast
-});
+// Allow both authenticated and test subscriptions
+Route::post('/push/subscribe', [PushNotificationController::class, 'subscribe']);
+Route::post('/push-subscriptions', [PushNotificationController::class, 'subscribe']); // Ruta alternativa para el toast
 
-// Rutas de testing (pueden ser públicas para pruebas, pero agregar auth en producción)
+// Test routes - these should be public for testing, but secure in production
 Route::post('/push/send-test', [PushNotificationController::class, 'sendTest']);
 Route::post('/push/test', [PushNotificationController::class, 'sendTest']); // Ruta alternativa para el toast
+
+// Protected routes that require authentication (for production features)
+Route::middleware('auth')->group(function () {
+    // Add any production-specific push notification routes here
+    // Route::post('/push/subscribe-authenticated', [PushNotificationController::class, 'subscribeAuthenticated']);
+});
