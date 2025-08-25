@@ -235,10 +235,14 @@ async function checkSimpleNotificationStatus() {
     if (simpleToastShown) return;
     
     console.log('🔍 Verificando estado de notificaciones...');
+    console.log('🌐 URL actual:', window.location.href);
+    console.log('🔐 Token CSRF disponible:', !!document.querySelector('meta[name="csrf-token"]'));
     
     // Verificar soporte del navegador
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
         console.log('❌ Navegador no compatible con notificaciones push');
+        console.log('🔍 ServiceWorker support:', 'serviceWorker' in navigator);
+        console.log('🔍 PushManager support:', 'PushManager' in window);
         return;
     }
     
@@ -262,17 +266,28 @@ async function checkSimpleNotificationStatus() {
             const registration = await navigator.serviceWorker.getRegistration();
             if (!registration) {
                 console.log('📢 Mostrando toast - tiene permisos pero no service worker');
+                console.log('🔍 Detalles: Permisos = granted, pero Service Worker no registrado');
                 showSimpleToast('', 'new');
                 return;
             }
+            
+            console.log('✅ Service Worker encontrado:', registration);
+            console.log('🔍 SW Estado:', registration.active ? 'activo' : 'no activo');
+            console.log('🔍 SW Installing:', registration.installing ? 'instalando' : 'no instalando');
+            console.log('🔍 SW Waiting:', registration.waiting ? 'esperando' : 'no esperando');
             
             // Verificar suscripción local
             const subscription = await registration.pushManager.getSubscription();
             if (!subscription) {
                 console.log('📢 Mostrando toast - tiene permisos pero no suscripción local');
+                console.log('🔍 Detalles: Permisos = granted, SW = registrado, pero NO hay suscripción push');
+                console.log('🔧 Posible causa: Service Worker registrado pero nunca se suscribió a push notifications');
                 showSimpleToast('', 'new');
                 return;
             }
+            
+            console.log('✅ Suscripción local encontrada:', subscription);
+            console.log('📍 Endpoint:', subscription.endpoint.substring(0, 50) + '...');
             
             // Verificar si la suscripción existe en el servidor
             console.log('🔍 Verificando suscripción en el servidor...');
@@ -325,4 +340,118 @@ async function checkSimpleNotificationStatus() {
 // Función global para mostrar el toast manualmente
 window.showNotificationToast = showSimpleToast;
 window.checkNotificationStatus = checkSimpleNotificationStatus;
+
+// Función de diagnóstico completo
+window.diagnosePushNotifications = async function() {
+    console.log('🔬 === DIAGNÓSTICO COMPLETO DE PUSH NOTIFICATIONS ===');
+    
+    console.log('1️⃣ Soporte del navegador:');
+    console.log('   - ServiceWorker:', 'serviceWorker' in navigator);
+    console.log('   - PushManager:', 'PushManager' in window);
+    console.log('   - Notification:', 'Notification' in window);
+    
+    console.log('2️⃣ Permisos:');
+    console.log('   - Estado actual:', Notification.permission);
+    
+    console.log('3️⃣ Service Worker:');
+    try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+            console.log('   ✅ Registrado en:', registration.scope);
+            console.log('   - Activo:', !!registration.active);
+            console.log('   - Instalando:', !!registration.installing);
+            console.log('   - Esperando:', !!registration.waiting);
+            
+            console.log('4️⃣ Suscripción Push:');
+            try {
+                const subscription = await registration.pushManager.getSubscription();
+                if (subscription) {
+                    console.log('   ✅ Suscripción encontrada');
+                    console.log('   - Endpoint:', subscription.endpoint.substring(0, 60) + '...');
+                    console.log('   - Keys disponibles:', !!subscription.getKey);
+                } else {
+                    console.log('   ❌ NO hay suscripción push');
+                    console.log('   - Esto explica por qué aparece el toast');
+                }
+            } catch (subError) {
+                console.log('   ❌ Error obteniendo suscripción:', subError);
+            }
+        } else {
+            console.log('   ❌ NO registrado');
+        }
+    } catch (swError) {
+        console.log('   ❌ Error accediendo a Service Worker:', swError);
+    }
+    
+    console.log('5️⃣ Estado de la página:');
+    console.log('   - URL:', window.location.href);
+    console.log('   - CSRF Token:', !!document.querySelector('meta[name="csrf-token"]'));
+    console.log('   - Usuario autenticado:', !!document.querySelector('meta[name="csrf-token"]'));
+    
+    console.log('🔬 === FIN DIAGNÓSTICO ===');
+    
+    // También intentar verificar en el servidor si tenemos token
+    if (document.querySelector('meta[name="csrf-token"]')) {
+        console.log('6️⃣ Verificando suscripciones en el servidor...');
+        try {
+            const response = await fetch('/push/verify-subscription', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({endpoint: 'test-endpoint-for-debug'})
+            });
+            
+            console.log('   - Respuesta del servidor:', response.status);
+            if (response.ok) {
+                const result = await response.json();
+                console.log('   - Resultado:', result);
+            }
+        } catch (serverError) {
+            console.log('   - Error conectando al servidor:', serverError);
+        }
+    }
+};
+
+// Función para intentar reparar el Service Worker
+window.repairServiceWorker = async function() {
+    console.log('🔧 === INTENTANDO REPARAR SERVICE WORKER ===');
+    
+    try {
+        // 1. Desregistrar Service Workers existentes
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        console.log('🗑️ Desregistrando', registrations.length, 'Service Workers...');
+        
+        for (let registration of registrations) {
+            await registration.unregister();
+            console.log('   ✅ Desregistrado:', registration.scope);
+        }
+        
+        // 2. Limpiar cache del navegador relacionado con SW
+        if ('caches' in window) {
+            const cacheNames = await caches.keys();
+            console.log('🗑️ Limpiando', cacheNames.length, 'caches...');
+            for (let cacheName of cacheNames) {
+                await caches.delete(cacheName);
+                console.log('   ✅ Cache eliminado:', cacheName);
+            }
+        }
+        
+        // 3. Esperar un momento
+        console.log('⏳ Esperando 2 segundos...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // 4. Registrar nuevo Service Worker
+        console.log('📝 Registrando nuevo Service Worker...');
+        const registration = await navigator.serviceWorker.register('/serviceworker.js');
+        await navigator.serviceWorker.ready;
+        
+        console.log('✅ Service Worker reparado y registrado');
+        console.log('🔄 Recarga la página para verificar que funcione');
+        
+    } catch (error) {
+        console.error('❌ Error reparando Service Worker:', error);
+    }
+};
 </script>
