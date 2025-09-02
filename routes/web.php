@@ -41,6 +41,14 @@ Route::get('/test-api', function () {
 
 Route::post('/merma-humedad', [MermaHumedadController::class, 'getMermaHumedad']);
 
+// Test de Mantenimiento General - Push Notifications
+Route::get('/test-mantenimiento', [\App\Http\Controllers\TestMantenimientoController::class, 'index']);
+Route::post('/test-mantenimiento/crear', [\App\Http\Controllers\TestMantenimientoController::class, 'crearMantenimientoPrueba']);
+Route::post('/test-mantenimiento/crear-usuario-6', [\App\Http\Controllers\TestMantenimientoController::class, 'crearUsuario6']);
+Route::post('/test-mantenimiento/crear-suscripcion', [\App\Http\Controllers\TestMantenimientoController::class, 'crearSuscripcionPrueba']);
+Route::get('/test-mantenimiento/estado', [\App\Http\Controllers\TestMantenimientoController::class, 'obtenerEstado']);
+Route::post('/test-mantenimiento/limpiar', [\App\Http\Controllers\TestMantenimientoController::class, 'limpiarDatosPrueba']);
+
 // Push Notifications Routes
 Route::get('/push/vapid-public-key', [PushNotificationController::class, 'getVapidPublicKey']);
 Route::post('/push/verify-subscription', [PushNotificationController::class, 'verifySubscription']);
