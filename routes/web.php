@@ -34,6 +34,16 @@ Route::get('/firefox-debug', function () {
     return view('firefox-debug');
 });
 
+// Gestión de suscripciones push (requiere autenticación)
+Route::middleware('auth')->group(function () {
+    Route::get('/push-manager', [\App\Http\Controllers\PushSubscriptionManagerController::class, 'index']);
+    Route::get('/push-manager/user-subscriptions', [\App\Http\Controllers\PushSubscriptionManagerController::class, 'getUserSubscriptions']);
+    Route::post('/push-manager/delete-user-subscriptions', [\App\Http\Controllers\PushSubscriptionManagerController::class, 'deleteUserSubscriptions']);
+    Route::post('/push-manager/delete-subscription', [\App\Http\Controllers\PushSubscriptionManagerController::class, 'deleteSubscription']);
+    Route::get('/push-manager/stats', [\App\Http\Controllers\PushSubscriptionManagerController::class, 'getStats']);
+    Route::post('/push-manager/clean-all', [\App\Http\Controllers\PushSubscriptionManagerController::class, 'cleanAllSubscriptions']);
+});
+
 // Página de prueba para toast de notificaciones
 Route::get('/toast-test', function () {
     return view('toast-test');

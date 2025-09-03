@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -170,7 +171,60 @@ class MantenimientoGeneralResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]),
             ]);
-        }
+    }
+
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                TextEntry::make('fechaSolicitud')
+                    ->label('Fecha Solicitud')
+                    ->date('d-m-Y')
+                    ->size('lg'),
+                TextEntry::make('tarea')
+                    ->label('Tarea')
+                    ->size('lg'),
+                TextEntry::make('solicitado')
+                    ->label('Solicitado por')
+                    ->size('lg'),
+                TextEntry::make('prioridad')
+                    ->label('Prioridad Solicitada')
+                    ->size('lg'),
+                TextEntry::make('fechaRealizar')
+                    ->label('Fecha a Realizar')
+                    ->date('d-m-Y')
+                    ->size('lg'),
+                TextEntry::make('prioridad_orden')
+                    ->label('Orden Prioridad de Trabajo')
+                    ->size('lg'),
+                TextEntry::make('realizado')
+                    ->label('A realizar por')
+                    ->size('lg'),
+                TextEntry::make('fechaRealizado')
+                    ->label('Fecha Realizado')
+                    ->date('d-m-Y')
+                    ->size('lg'),
+                TextEntry::make('horas')
+                    ->label('Horas')
+                    ->size('lg'),
+                TextEntry::make('materiales')
+                    ->label('Materiales')
+                    ->size('lg'),
+                TextEntry::make('costo')
+                    ->label('Costo')
+                    ->size('lg'),
+                IconEntry::make('reparado')
+                    ->label('Realizado')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check')
+                    ->falseIcon('heroicon-o-x-mark')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->size('lg'),
+            ])
+            ->columns(3);
+    }
 
     public static function getRelations(): array
     {
