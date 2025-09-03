@@ -73,6 +73,8 @@ class MantenimientoGeneralResource extends Resource
                     // pero los usuarios de mantenimiento solo lo ven si el campo solicitado es 'Mantenimiento'
                     $userSector = match($userEmail) {
                         'carlos@barloventosrl.website' => 'Mantenimiento',
+                        'leandro@barloventosrl.website' => 'Mantenimiento',
+                        'federico@barloventosrl.website' => 'Mantenimiento',
                         default => ''
                     };
 
@@ -91,7 +93,12 @@ class MantenimientoGeneralResource extends Resource
                         ->numeric()
                         ->minValue(1)
                         ->helperText('Las tareas existentes se reorganizarán automáticamente'),
-                    Forms\Components\TextInput::make('realizado')->label('Realizado por'),
+                    Forms\Components\Select::make('realizado')->label('A realizar por')
+                    ->options([
+                        '9' => 'Federico',
+                        '5' => 'Luciano',
+                        '1' => 'Test',
+                    ]),
                     Forms\Components\DatePicker::make('fechaRealizado'),
                     Forms\Components\TextInput::make('horas')->numeric(),
                     Forms\Components\Textarea::make('materiales'),
@@ -155,6 +162,7 @@ class MantenimientoGeneralResource extends Resource
             //
             ])
             ->actions([
+            Tables\Actions\ViewAction::make(),
             Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -175,8 +183,8 @@ class MantenimientoGeneralResource extends Resource
     {
         return [
             'index' => Pages\ListMantenimientoGeneral::route('/'),
-            // 'create' => Pages\CreateMantenimientoGeneral::route('/create'),
-            // 'edit' => Pages\EditMantenimientoGeneral::route('/{record}/edit'),
+            'view' => Pages\ViewMantenimientoGeneral::route('/{record}'),
+            'edit' => Pages\EditMantenimientoGeneral::route('/{record}/edit'),
         ];
     }
 

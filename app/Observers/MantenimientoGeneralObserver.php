@@ -30,7 +30,7 @@ class MantenimientoGeneralObserver
             'tag' => 'mantenimiento-general-' . $mantenimientoGeneral->id,
             'vibrate' => [200, 100, 200], // ejemplo de patrón de vibración
             'data' => [
-                'url' => url('/mantenimientoGeneral/mantenimiento-generals'),
+                'url' => url('/mantenimientoGeneral/mantenimiento-generals/' . $mantenimientoGeneral->id . '/edit'),
                 'type' => 'mantenimiento_general',
                 'record_id' => $mantenimientoGeneral->id,
                 'timestamp' => now()->toISOString(),
@@ -82,7 +82,7 @@ class MantenimientoGeneralObserver
                     'tag' => 'mantenimiento-tarea-' . $mantenimientoGeneral->id,
                     'vibrate' => [200, 100, 200], // ejemplo de patrón de vibración
                     'data' => [
-                        'url' => url('/mantenimientoGeneral/mantenimiento-generals/'),
+                        'url' => url('/mantenimientoGeneral/mantenimiento-generals/' . $mantenimientoGeneral->id),
                         'type' => 'mantenimiento_general_task_assigned',
                         'record_id' => $mantenimientoGeneral->id,
                         'changed_fields' => $changedFields,
@@ -91,18 +91,16 @@ class MantenimientoGeneralObserver
                 ];
 
                 // Enviar notificación a los usuarios ID 4 y 5
-                $userIds = [4, 5];
+                $userId = $mantenimientoGeneral->realizado;
                 $totalNotifications = 0;
                 
-                foreach ($userIds as $userId) {
-                    $successCount = $this->pushService->sendToUser($userId, $payload);
-                    $totalNotifications += $successCount;
-                }
-                
+                $successCount = $this->pushService->sendToUser($userId, $payload);
+                $totalNotifications += $successCount;
+            
                 Log::info('Notificaciones de tarea enviadas', [
                     'type' => 'mantenimiento_general_task_assigned',
                     'record_id' => $mantenimientoGeneral->id,
-                    'user_ids' => $userIds,
+                    'user_ids' => $userId,
                     'changed_fields' => $changedFields,
                     'notifications_sent' => $totalNotifications
                 ]);
@@ -111,7 +109,7 @@ class MantenimientoGeneralObserver
                 Log::error('Error enviando notificaciones de tarea', [
                     'type' => 'mantenimiento_general_task_assigned',
                     'record_id' => $mantenimientoGeneral->id,
-                    'user_ids' => [4, 5],
+                    'user_ids' => $userId,
                     'error' => $e->getMessage()
                 ]);
             }

@@ -191,16 +191,47 @@ class PushNotificationService
     {
         $endpointHash = hash('sha256', $subscriptionData['endpoint']);
         
-        return PushSubscription::updateOrCreate(
-            [
+        Log::info('Creating/updating push subscription', [
+            'user_id' => $userId,
+            'endpoint_hash' => $endpointHash,
+            'endpoint_preview' => substr($subscriptionData['endpoint'], 0, 50) . '...'
+        ]);
+        
+        // Buscar si ya existe una suscripción con este endpoint
+        $existingSubscription = PushSubscription::where('endpoint_hash', $endpointHash)->first();
+        
+        if ($existingSubscription) {
+            Log::info('Found existing subscription, updating', [
+                'existing_user_id' => $existingSubscription->user_id,
+                'new_user_id' => $userId,
+                'subscription_id' => $existingSubscription->id
+            ]);
+        } else {
+            Log::info('Creating new subscription', [
                 'user_id' => $userId,
+                'endpoint_hash' => $endpointHash
+            ]);
+        }
+        
+        // Buscar por endpoint_hash únicamente, ya que un endpoint es único independientemente del usuario
+        $subscription = PushSubscription::updateOrCreate(
+            [
                 'endpoint_hash' => $endpointHash,
             ],
             [
+                'user_id' => $userId,
                 'endpoint' => $subscriptionData['endpoint'],
                 'public_key' => $subscriptionData['keys']['p256dh'],
                 'auth_token' => $subscriptionData['keys']['auth'],
             ]
         );
+        
+        Log::info('Subscription created/updated successfully', [
+            'subscription_id' => $subscription->id,
+            'user_id' => $subscription->user_id,
+            'was_recently_created' => $subscription->wasRecentlyCreated
+        ]);
+        
+        return $subscription;
     }
 }
