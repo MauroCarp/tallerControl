@@ -29,6 +29,11 @@ Route::get('/chrome-debug', function () {
     return view('chrome-debug');
 });
 
+// Página de diagnóstico Firefox para push notifications
+Route::get('/firefox-debug', function () {
+    return view('firefox-debug');
+});
+
 // Página de prueba para toast de notificaciones
 Route::get('/toast-test', function () {
     return view('toast-test');
