@@ -66,4 +66,12 @@ class User extends Authenticatable implements FilamentUser
         //     default => false,
         // };
     }
+
+    /**
+     * Relación con las suscripciones push
+     */
+    public function pushSubscriptions()
+    {
+        return $this->hasMany(\App\Models\PushSubscription::class);
+    }
 }

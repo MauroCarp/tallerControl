@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -76,6 +77,8 @@ class MantenimientoGeneralResource extends Resource
                         'carlos@barloventosrl.website' => 'Mantenimiento',
                         'leandro@barloventosrl.website' => 'Mantenimiento',
                         'federico@barloventosrl.website' => 'Mantenimiento',
+                        'leandro@barloventosrl.website' => 'Mantenimiento',
+                        'federico@barloventosrl.website' => 'Mantenimiento',
                         default => ''
                     };
 
@@ -94,6 +97,12 @@ class MantenimientoGeneralResource extends Resource
                         ->numeric()
                         ->minValue(1)
                         ->helperText('Las tareas existentes se reorganizarán automáticamente'),
+                    Forms\Components\Select::make('realizado')->label('A realizar por')
+                    ->options([
+                        '9' => 'Federico',
+                        '5' => 'Luciano',
+                        '1' => 'Test',
+                    ]),
                     Forms\Components\Select::make('realizado')->label('A realizar por')
                     ->options([
                         '9' => 'Federico',
@@ -163,6 +172,7 @@ class MantenimientoGeneralResource extends Resource
             ])
             ->actions([
             Tables\Actions\ViewAction::make(),
+            Tables\Actions\ViewAction::make(),
             Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
@@ -170,6 +180,60 @@ class MantenimientoGeneralResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]),
             ]);
+    }
+    }
+
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                TextEntry::make('fechaSolicitud')
+                    ->label('Fecha Solicitud')
+                    ->date('d-m-Y')
+                    ->size('lg'),
+                TextEntry::make('tarea')
+                    ->label('Tarea')
+                    ->size('lg'),
+                TextEntry::make('solicitado')
+                    ->label('Solicitado por')
+                    ->size('lg'),
+                TextEntry::make('prioridad')
+                    ->label('Prioridad Solicitada')
+                    ->size('lg'),
+                TextEntry::make('fechaRealizar')
+                    ->label('Fecha a Realizar')
+                    ->date('d-m-Y')
+                    ->size('lg'),
+                TextEntry::make('prioridad_orden')
+                    ->label('Orden Prioridad de Trabajo')
+                    ->size('lg'),
+                TextEntry::make('realizado')
+                    ->label('A realizar por')
+                    ->size('lg'),
+                TextEntry::make('fechaRealizado')
+                    ->label('Fecha Realizado')
+                    ->date('d-m-Y')
+                    ->size('lg'),
+                TextEntry::make('horas')
+                    ->label('Horas')
+                    ->size('lg'),
+                TextEntry::make('materiales')
+                    ->label('Materiales')
+                    ->size('lg'),
+                TextEntry::make('costo')
+                    ->label('Costo')
+                    ->size('lg'),
+                IconEntry::make('reparado')
+                    ->label('Realizado')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check')
+                    ->falseIcon('heroicon-o-x-mark')
+                    ->trueColor('success')
+                    ->falseColor('danger')
+                    ->size('lg'),
+            ])
+            ->columns(3);
     }
 
 
@@ -236,6 +300,8 @@ class MantenimientoGeneralResource extends Resource
     {
         return [
             'index' => Pages\ListMantenimientoGeneral::route('/'),
+            'view' => Pages\ViewMantenimientoGeneral::route('/{record}'),
+            'edit' => Pages\EditMantenimientoGeneral::route('/{record}/edit'),
             'view' => Pages\ViewMantenimientoGeneral::route('/{record}'),
             'edit' => Pages\EditMantenimientoGeneral::route('/{record}/edit'),
         ];

@@ -128,9 +128,23 @@ async function enableSimpleNotifications() {
         
         // Registrar service worker
         console.log('🔧 Registrando service worker...');
-        const registration = await navigator.serviceWorker.register('/serviceworker.js');
+        const registration = await navigator.serviceWorker.register('/serviceworker.js', {
+            scope: '/' // Forzar scope en la raíz para Firefox
+        });
+        console.log('🔧 Service worker registrado, esperando que esté ready...');
         await navigator.serviceWorker.ready;
-        console.log('✅ Service worker registrado');
+        console.log('✅ Service worker registrado y ready');
+        console.log('🔍 Scope del SW:', registration.scope);
+        
+        // En Firefox, esperar un poco más para asegurar que el SW esté completamente activo
+        if (navigator.userAgent.includes('Firefox')) {
+            console.log('🔧 Firefox detectado, esperando activación completa...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Verificar que el SW esté realmente activo
+            const activeRegistration = await navigator.serviceWorker.getRegistration('/');
+            console.log('🔍 SW activo después de espera:', !!activeRegistration?.active);
+        }
         
         // Obtener clave VAPID del servidor
         console.log('🔑 Obteniendo clave VAPID...');
@@ -225,7 +239,11 @@ async function enableSimpleNotifications() {
 document.addEventListener('DOMContentLoaded', function() {
     // Solo verificar si estamos en una página autenticada
     if (document.querySelector('meta[name="csrf-token"]')) {
-        setTimeout(checkSimpleNotificationStatus, 2000);
+        // En Firefox, esperar un poco más para que el SW esté completamente cargado
+        const isFirefox = navigator.userAgent.includes('Firefox');
+        const delay = isFirefox ? 3000 : 2000;
+        console.log('🔍 Esperando', delay, 'ms antes de verificar (Firefox:', isFirefox, ')');
+        setTimeout(checkSimpleNotificationStatus, delay);
     } else {
         console.log('📝 Usuario no autenticado - toast no se mostrará');
     }
@@ -236,7 +254,10 @@ async function checkSimpleNotificationStatus() {
     
     console.log('🔍 Verificando estado de notificaciones...');
     console.log('🌐 URL actual:', window.location.href);
+    console.log('🌐 Pathname:', window.location.pathname);
     console.log('🔐 Token CSRF disponible:', !!document.querySelector('meta[name="csrf-token"]'));
+    console.log('🌐 User Agent:', navigator.userAgent);
+    console.log('🔍 Es Firefox:', navigator.userAgent.includes('Firefox'));
     
     // Verificar soporte del navegador
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -262,11 +283,40 @@ async function checkSimpleNotificationStatus() {
     
     if (permission === 'granted') {
         try {
-            // Verificar service worker
-            const registration = await navigator.serviceWorker.getRegistration();
+            // Verificar service worker - Firefox específico
+            console.log('🔍 Verificando Service Worker...');
+            console.log('🔍 Service Worker support:', 'serviceWorker' in navigator);
+            
+            // En Firefox, verificar todas las registraciones disponibles
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            console.log('🔍 Todas las registraciones disponibles:', registrations.length);
+            registrations.forEach((reg, index) => {
+                console.log(`🔍 Registración ${index}:`, {
+                    scope: reg.scope,
+                    active: !!reg.active,
+                    installing: !!reg.installing,
+                    waiting: !!reg.waiting
+                });
+            });
+            
+            // Intentar obtener la registración específica - Firefox fix
+            let registration = await navigator.serviceWorker.getRegistration('/');
+            
+            // Si no se encuentra en Firefox, intentar buscar en todas las registraciones
+            if (!registration && navigator.userAgent.includes('Firefox')) {
+                console.log('🦊 Firefox: No se encontró registración en /, buscando en todas...');
+                const allRegistrations = await navigator.serviceWorker.getRegistrations();
+                if (allRegistrations.length > 0) {
+                    registration = allRegistrations[0]; // Usar la primera disponible
+                    console.log('🦊 Firefox: Usando registración alternativa:', registration.scope);
+                }
+            }
+            
             if (!registration) {
-                console.log('📢 Mostrando toast - tiene permisos pero no service worker');
-                console.log('🔍 Detalles: Permisos = granted, pero Service Worker no registrado');
+                console.log('📢 Mostrando toast - tiene permisos pero no service worker en scope raíz');
+                console.log('🔍 Detalles: Permisos = granted, pero Service Worker no registrado en /');
+                console.log('🔍 URL actual:', window.location.href);
+                console.log('🔍 Total registraciones:', registrations.length);
                 showSimpleToast('', 'new');
                 return;
             }
@@ -275,6 +325,7 @@ async function checkSimpleNotificationStatus() {
             console.log('🔍 SW Estado:', registration.active ? 'activo' : 'no activo');
             console.log('🔍 SW Installing:', registration.installing ? 'instalando' : 'no instalando');
             console.log('🔍 SW Waiting:', registration.waiting ? 'esperando' : 'no esperando');
+            console.log('🔍 SW Scope:', registration.scope);
             
             // Verificar suscripción local
             const subscription = await registration.pushManager.getSubscription();
@@ -282,6 +333,8 @@ async function checkSimpleNotificationStatus() {
                 console.log('📢 Mostrando toast - tiene permisos pero no suscripción local');
                 console.log('🔍 Detalles: Permisos = granted, SW = registrado, pero NO hay suscripción push');
                 console.log('🔧 Posible causa: Service Worker registrado pero nunca se suscribió a push notifications');
+                console.log('🔍 URL actual:', window.location.href);
+                console.log('🔍 Firefox específico:', navigator.userAgent.includes('Firefox'));
                 showSimpleToast('', 'new');
                 return;
             }
@@ -340,6 +393,111 @@ async function checkSimpleNotificationStatus() {
 // Función global para mostrar el toast manualmente
 window.showNotificationToast = showSimpleToast;
 window.checkNotificationStatus = checkSimpleNotificationStatus;
+
+// Función específica para diagnosticar Firefox
+window.diagnoseFirefoxPushNotifications = async function() {
+    console.log('🦊 === DIAGNÓSTICO ESPECÍFICO PARA FIREFOX ===');
+    
+    console.log('1️⃣ Información del navegador:');
+    console.log('   - User Agent:', navigator.userAgent);
+    console.log('   - Es Firefox:', navigator.userAgent.includes('Firefox'));
+    console.log('   - URL actual:', window.location.href);
+    console.log('   - Pathname:', window.location.pathname);
+    
+    console.log('2️⃣ Verificando todas las registraciones de Service Worker:');
+    try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        console.log('   - Total registraciones:', registrations.length);
+        
+        registrations.forEach((reg, index) => {
+            console.log(`   📋 Registración ${index + 1}:`);
+            console.log(`      - Scope: ${reg.scope}`);
+            console.log(`      - Active: ${!!reg.active}`);
+            console.log(`      - Installing: ${!!reg.installing}`);
+            console.log(`      - Waiting: ${!!reg.waiting}`);
+            console.log(`      - Update found: ${!!reg.update}`);
+        });
+        
+        // Verificar registración específica para la raíz
+        console.log('3️⃣ Verificando registración específica para "/"');
+        const rootRegistration = await navigator.serviceWorker.getRegistration('/');
+        if (rootRegistration) {
+            console.log('   ✅ Registración en "/" encontrada');
+            console.log('   - Scope:', rootRegistration.scope);
+            console.log('   - Estado:', rootRegistration.active ? 'activo' : 'inactivo');
+            
+            // Verificar suscripción push
+            console.log('4️⃣ Verificando suscripción push:');
+            try {
+                const subscription = await rootRegistration.pushManager.getSubscription();
+                if (subscription) {
+                    console.log('   ✅ Suscripción encontrada');
+                    console.log('   - Endpoint:', subscription.endpoint.substring(0, 60) + '...');
+                    console.log('   - Keys disponibles:', !!subscription.getKey);
+                } else {
+                    console.log('   ❌ NO hay suscripción push');
+                    console.log('   - Esto explica por qué aparece el toast en esta URL');
+                }
+            } catch (subError) {
+                console.log('   ❌ Error obteniendo suscripción:', subError);
+            }
+        } else {
+            console.log('   ❌ NO hay registración en "/"');
+            console.log('   - Esto puede explicar el problema en Firefox');
+        }
+        
+        // Verificar registración para la URL actual
+        console.log('5️⃣ Verificando registración para URL actual');
+        const currentRegistration = await navigator.serviceWorker.getRegistration(window.location.pathname);
+        if (currentRegistration) {
+            console.log('   ✅ Registración para path actual encontrada');
+            console.log('   - Scope:', currentRegistration.scope);
+        } else {
+            console.log('   ⚠️ NO hay registración específica para path actual');
+            console.log('   - Path actual:', window.location.pathname);
+        }
+        
+    } catch (error) {
+        console.log('   ❌ Error obteniendo registraciones:', error);
+    }
+    
+    console.log('🦊 === FIN DIAGNÓSTICO FIREFOX ===');
+};
+
+// Función para forzar re-registro del Service Worker en Firefox
+window.forceReregisterServiceWorkerFirefox = async function() {
+    console.log('🦊 === FORZANDO RE-REGISTRO EN FIREFOX ===');
+    
+    try {
+        // Desregistrar todos los Service Workers
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        console.log('🗑️ Desregistrando', registrations.length, 'Service Workers...');
+        
+        for (let registration of registrations) {
+            await registration.unregister();
+            console.log('   ✅ Desregistrado:', registration.scope);
+        }
+        
+        // Esperar más tiempo en Firefox
+        console.log('⏳ Esperando 3 segundos (Firefox)...');
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        
+        // Re-registrar
+        console.log('📝 Re-registrando Service Worker...');
+        const registration = await navigator.serviceWorker.register('/serviceworker.js');
+        await navigator.serviceWorker.ready;
+        
+        // Esperar activación completa en Firefox
+        console.log('⏳ Esperando activación completa en Firefox...');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        console.log('✅ Re-registro completado para Firefox');
+        console.log('🔄 Recarga la página para verificar');
+        
+    } catch (error) {
+        console.error('❌ Error en re-registro para Firefox:', error);
+    }
+};
 
 // Función de diagnóstico completo
 window.diagnosePushNotifications = async function() {
