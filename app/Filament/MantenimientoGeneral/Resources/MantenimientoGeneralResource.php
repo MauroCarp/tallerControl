@@ -76,8 +76,6 @@ class MantenimientoGeneralResource extends Resource
                         'carlos@barloventosrl.website' => 'Mantenimiento',
                         'leandro@barloventosrl.website' => 'Mantenimiento',
                         'federico@barloventosrl.website' => 'Mantenimiento',
-                        'leandro@barloventosrl.website' => 'Mantenimiento',
-                        'federico@barloventosrl.website' => 'Mantenimiento',
                         default => ''
                     };
 
@@ -101,11 +99,6 @@ class MantenimientoGeneralResource extends Resource
                         '9' => 'Federico',
                         '5' => 'Luciano',
                         '1' => 'Test',
-                    ]),
-                    Forms\Components\Select::make('realizado')->label('A realizar por')
-                    ->options([
-                        '9' => 'Federico',
-                        '5' => 'Luciano',
                     ]),
                     Forms\Components\DatePicker::make('fechaRealizado'),
                     Forms\Components\TextInput::make('horas')->numeric(),
@@ -171,8 +164,8 @@ class MantenimientoGeneralResource extends Resource
             ])
             ->actions([
             Tables\Actions\ViewAction::make(),
-            Tables\Actions\ViewAction::make(),
             Tables\Actions\EditAction::make(),
+            Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
             Tables\Actions\BulkActionGroup::make([
@@ -180,6 +173,7 @@ class MantenimientoGeneralResource extends Resource
             ]),
             ]);
     }
+
 
     public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
     {
@@ -244,8 +238,6 @@ class MantenimientoGeneralResource extends Resource
     {
         return [
             'index' => Pages\ListMantenimientoGeneral::route('/'),
-            'view' => Pages\ViewMantenimientoGeneral::route('/{record}'),
-            'edit' => Pages\EditMantenimientoGeneral::route('/{record}/edit'),
             'view' => Pages\ViewMantenimientoGeneral::route('/{record}'),
             'edit' => Pages\EditMantenimientoGeneral::route('/{record}/edit'),
         ];
