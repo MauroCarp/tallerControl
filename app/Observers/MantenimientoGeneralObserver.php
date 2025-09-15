@@ -116,40 +116,41 @@ class MantenimientoGeneralObserver
         }
 
         // Verificar si el campo 'reparado' cambió a 1 (completado)
-        // if ($mantenimientoGeneral->wasChanged('reparado') && $mantenimientoGeneral->reparado == 1) {
-        //     try {
-        //         $payload = [
-        //             'title' => '✅ Mantenimiento Completado',
-        //             'body' => "El mantenimiento general #{$mantenimientoGeneral->id} ha sido marcado como completado",
-        //             'icon' => '/images/icons/icon-192x192.png',
-        //             'badge' => '/images/icons/icon-72x72.png',
-        //             'tag' => 'mantenimiento-completado-' . $mantenimientoGeneral->id,
-        //             'data' => [
-        //                 'url' => url('/admin/mantenimiento-generals/' . $mantenimientoGeneral->id),
-        //                 'type' => 'mantenimiento_general_completed',
-        //                 'record_id' => $mantenimientoGeneral->id,
-        //                 'timestamp' => now()->toISOString(),
-        //             ]
-        //         ];
+        if ($mantenimientoGeneral->wasChanged('reparado') && $mantenimientoGeneral->reparado == 1) {
+            try {
+                $payload = [
+                    'title' => '✅ Mantenimiento Completado',
+                    'body' => "La tarea \"{$mantenimientoGeneral->tarea}\" ha sido marcado como completado",
+                    'icon' => '/images/icons/icon-192x192.png',
+                    'badge' => '/images/icons/icon-72x72.png',
+                    'tag' => 'mantenimiento-completado-' . $mantenimientoGeneral->id,
+                    'vibrate' => [200, 100, 200],
+                    'data' => [
+                        'url' => url('/mantenimientoGeneral/mantenimiento-generals/' . $mantenimientoGeneral->id),
+                        'type' => 'mantenimiento_general_completed',
+                        'record_id' => $mantenimientoGeneral->id,
+                        'timestamp' => now()->toISOString(),
+                    ]
+                ];
 
-        //         $successCount = $this->pushService->sendToUser(6, $payload);
+                $successCount = $this->pushService->sendToUser(7, $payload);
                 
-        //         Log::info('Notificación de completado enviada', [
-        //             'type' => 'mantenimiento_general_completed',
-        //             'record_id' => $mantenimientoGeneral->id,
-        //             'user_id' => 6,
-        //             'notifications_sent' => $successCount
-        //         ]);
+                Log::info('Notificación de completado enviada', [
+                    'type' => 'mantenimiento_general_completed',
+                    'record_id' => $mantenimientoGeneral->id,
+                    'user_id' => 7,
+                    'notifications_sent' => $successCount
+                ]);
 
-        //     } catch (\Exception $e) {
-        //         Log::error('Error enviando notificación de completado', [
-        //             'type' => 'mantenimiento_general_completed',
-        //             'record_id' => $mantenimientoGeneral->id,
-        //             'user_id' => 6,
-        //             'error' => $e->getMessage()
-        //         ]);
-        //     }
-        // }
+            } catch (\Exception $e) {
+                Log::error('Error enviando notificación de completado', [
+                    'type' => 'mantenimiento_general_completed',
+                    'record_id' => $mantenimientoGeneral->id,
+                    'user_id' => 7,
+                    'error' => $e->getMessage()
+                ]);
+            }
+        }
     }
 
     /**
