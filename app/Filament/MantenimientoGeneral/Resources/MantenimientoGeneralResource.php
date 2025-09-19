@@ -89,16 +89,10 @@ class MantenimientoGeneralResource extends Resource
                 ->schema([
                     
                     Forms\Components\DatePicker::make('fechaRealizar')->label('Fecha a Realizar'),
-                    Forms\Components\TextInput::make('prioridad_orden')
-                        ->label('Orden de Prioridad')
-                        ->numeric()
-                        ->minValue(1)
-                        ->helperText('Las tareas existentes se reorganizarán automáticamente'),
                     Forms\Components\Select::make('realizado')->label('A realizar por')
                     ->options([
                         '9' => 'Federico',
                         '5' => 'Luciano',
-                        '1' => 'Test',
                     ]),
                     Forms\Components\DatePicker::make('fechaRealizado'),
                     Forms\Components\TextInput::make('horas')->numeric(),
@@ -148,11 +142,6 @@ class MantenimientoGeneralResource extends Resource
                 ->trueColor('success')
                 ->falseColor('danger'),
             Tables\Columns\TextColumn::make('fechaRealizar')->label('Fecha a Realizar')->date('d-m-Y'),
-            Tables\Columns\TextColumn::make('prioridad_orden')
-                ->label('Orden Prioridad de Trabajo')
-                ->sortable()
-                ->badge()
-                ->color('info'),
             // Tables\Columns\TextColumn::make('realizado')->label('Realizado por'),
             // Tables\Columns\TextColumn::make('horas')->label('Horas'),
             // Tables\Columns\TextColumn::make('materiales')->label('Materiales')->limit(50),
@@ -195,9 +184,6 @@ class MantenimientoGeneralResource extends Resource
                 TextEntry::make('fechaRealizar')
                     ->label('Fecha a Realizar')
                     ->date('d-m-Y')
-                    ->size('lg'),
-                TextEntry::make('prioridad_orden')
-                    ->label('Orden Prioridad de Trabajo')
                     ->size('lg'),
                 TextEntry::make('realizado')
                     ->label('A realizar por')

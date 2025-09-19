@@ -61,22 +61,13 @@ class MantenimientoGeneralObserver
      */
     public function updated(MantenimientoGeneral $mantenimientoGeneral): void
     {
-        // Verificar si los campos prioridad_orden o fechaRealizar fueron modificados
-        if ($mantenimientoGeneral->wasChanged('prioridad_orden') || $mantenimientoGeneral->wasChanged('fechaRealizar')) {
+        // Verificar si el campo fechaRealizar fue modificado
+        if ($mantenimientoGeneral->wasChanged('fechaRealizar')) {
             try {
-                $changedFields = [];
-                if ($mantenimientoGeneral->wasChanged('prioridad_orden')) {
-                    $changedFields[] = 'orden de prioridad';
-                }
-                if ($mantenimientoGeneral->wasChanged('fechaRealizar')) {
-                    $changedFields[] = 'fecha a realizar';
-                }
-                
-                $fieldsText = implode(' y ', $changedFields);
                 
                 $payload = [
                     'title' => '📋 Tarea de Mantenimiento Asignada',
-                    'body' => "Se ha actualizado el {$fieldsText}. Tienes una nueva tarea por realizar.",
+                    'body' => "Tienes una nueva tarea por realizar.",
                     'icon' => '/images/icons/icon-192x192.png',
                     'badge' => '/images/icons/icon-72x72.png',
                     'tag' => 'mantenimiento-tarea-' . $mantenimientoGeneral->id,
@@ -179,20 +170,11 @@ class MantenimientoGeneralObserver
 
     public function creating(MantenimientoGeneral $mantenimiento)
     {
-        // Comentado temporalmente hasta verificar la estructura de la tabla
-        // if ($mantenimiento->prioridad_orden && $mantenimiento->reparado == 0) {
-        //     MantenimientoGeneral::reorganizarPrioridades($mantenimiento->prioridad_orden);
-        // }
+
     }
 
     public function updating(MantenimientoGeneral $mantenimiento)
     {
-        // Comentado temporalmente hasta verificar la estructura de la tabla
-        // if ($mantenimiento->isDirty('prioridad_orden') && $mantenimiento->reparado == 0) {
-        //     MantenimientoGeneral::reorganizarPrioridades(
-        //         $mantenimiento->prioridad_orden, 
-        //         $mantenimiento->id
-        //     );
-        // }
+
     }
 }
