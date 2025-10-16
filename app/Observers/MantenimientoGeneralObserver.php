@@ -63,6 +63,9 @@ class MantenimientoGeneralObserver
     {
         // Verificar si el campo fechaRealizar fue modificado
         if ($mantenimientoGeneral->wasChanged('fechaRealizar')) {
+            $userId = $mantenimientoGeneral->realizado;
+            $changedFields = $mantenimientoGeneral->getChanges();
+            
             try {
                 
                 $payload = [
@@ -81,13 +84,11 @@ class MantenimientoGeneralObserver
                     ]
                 ];
 
-                // Enviar notificación a los usuarios ID 4 y 5
-                $userId = $mantenimientoGeneral->realizado;
+                // Enviar notificación al usuario asignado
                 $totalNotifications = 0;
-                
                 $successCount = $this->pushService->sendToUser($userId, $payload);
                 $totalNotifications += $successCount;
-            
+
                 Log::info('Notificaciones de tarea enviadas', [
                     'type' => 'mantenimiento_general_task_assigned',
                     'record_id' => $mantenimientoGeneral->id,

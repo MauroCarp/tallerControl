@@ -31,41 +31,67 @@ class MantenimientoGeneralResource extends Resource
             Forms\Components\Wizard::make([
                 Forms\Components\Wizard\Step::make('Solicitud')
                 ->schema([
-                    Forms\Components\DatePicker::make('fechaSolicitud')->required(),
-                    Forms\Components\Textarea::make('tarea')->required(),
+                    Forms\Components\DatePicker::make('fechaSolicitud')
+                        ->required(),
+                        // ->disabled(function () {
+                        //     $user = auth()->user();
+                        //     return $user && $user->id === 6;
+                        // }),
+                    Forms\Components\Textarea::make('tarea')
+                        ->required(),
+                        // ->disabled(function () {
+                        //     $user = auth()->user();
+                        //     return $user && $user->id === 6;
+                        // }),
                     Forms\Components\Select::make('prioridad')
-                    ->label('Prioridad')
-                    ->required()
-                    ->options([
-                        'BAJA' => 'BAJA',
-                        'NORMAL' => 'NORMAL',
-                        'ALTA' => 'ALTA',
-                        'MUY ALTA' => 'MUY ALTA',
-                    ]),
+                        ->label('Prioridad')
+                        ->required()
+                        ->options([
+                            'BAJA' => 'BAJA',
+                            'NORMAL' => 'NORMAL',
+                            'ALTA' => 'ALTA',
+                            'MUY ALTA' => 'MUY ALTA',
+                        ]),
+                        // ->disabled(function () {
+                        //     $user = auth()->user();
+                        //     return $user && $user->id === 6;
+                        // }),
                     Forms\Components\TextInput::make('solicitado')
-                    ->label('Sector')
-                    ->readOnly()
-                    ->default(function () {
-                        $userEmail = auth()->user()?->email;
-                        switch ($userEmail) {
-                        case 'ruben@barloventosrl.website':
-                            return 'Gerencial';
-                        case 'mauro@mauro.com':
-                            return 'Gerencial';
-                        case 'ornela@barloventosrl.website':
-                            return 'Produccion';
-                        case 'mariano@barloventosrl.website':
-                            return 'Administracion';
-                        case 'carlos@barloventosrl.website':
-                            return 'Mantenimiento';
-                        // Agrega más casos según sea necesario
-                        default:
-                            return '';
-                        }
-                    }),
+                        ->label('Sector')
+                        // ->disabled(function () {
+                        //     $user = auth()->user();
+                        //     return $user && $user->id === 6;
+                        // })
+                        ->default(function () {
+                            $userEmail = auth()->user()?->email;
+                            switch ($userEmail) {
+                            case 'ruben@barloventosrl.website':
+                                return 'Gerencial';
+                            case 'mauro@mauro.com':
+                                return 'Gerencial';
+                            case 'ornela@barloventosrl.website':
+                                return 'Produccion';
+                            case 'mariano@barloventosrl.website':
+                                return 'Administracion';
+                            case 'carlos@barloventosrl.website':
+                                return 'Mantenimiento';
+                            case 'carlosT@barloventosrl.website':
+                                return 'Mantenimiento';
+                            // Agrega más casos según sea necesario
+                            default:
+                                return '';
+                            }
+                        }),
                 ])->hidden(function (string $context, ?MantenimientoGeneral $record) {
                     if ($context !== 'edit' || !$record) {
                         return false; // Mostrar en creación
+                    }
+                    
+                    $user = auth()->user();
+                    
+                    // El usuario ID=6 siempre puede ver el paso 'Solicitud'
+                    if ($user && $user->id === 6) {
+                        return false;
                     }
                     
                     $userEmail = auth()->user()?->email;
@@ -74,6 +100,7 @@ class MantenimientoGeneralResource extends Resource
                     // pero los usuarios de mantenimiento solo lo ven si el campo solicitado es 'Mantenimiento'
                     $userSector = match($userEmail) {
                         'carlos@barloventosrl.website' => 'Mantenimiento',
+                        'carlosT@barloventosrl.website' => 'Mantenimiento',
                         'leandro@barloventosrl.website' => 'Mantenimiento',
                         'federico@barloventosrl.website' => 'Mantenimiento',
                         default => ''
@@ -103,12 +130,19 @@ class MantenimientoGeneralResource extends Resource
                     ->dehydrateStateUsing(fn ($state) => $state ? 1 : 0),
                 ])
                 ->hidden(function (string $context) {
-                    // Solo mostrar en edición y si el usuario tiene el rol adecuado
+                    // Solo mostrar en edición
                     if ($context !== 'edit') {
-                    return true;
+                        return true;
                     }
+                    
                     $user = auth()->user();
-                    // Cambia 'admin' por el nombre del rol que desees
+                    
+                    // El usuario ID=6 siempre puede ver y acceder al paso 'Realización'
+                    if ($user && $user->id === 6) {
+                        return false;
+                    }
+                    
+                    // Para otros usuarios, verificar el rol
                     return !$user || !$user->hasRole('mantenimiento');
                 })
                 ->columns(3),
